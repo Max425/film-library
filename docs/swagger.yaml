@@ -1,8 +1,28 @@
 basePath: /
 definitions:
-  domain.Actor:
+  dto.Actor:
+    properties:
+      birth_date:
+        type: string
+      gender:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
     type: object
-  domain.Film:
+  dto.Film:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      rating:
+        type: number
+      release_date:
+        type: string
+      title:
+        type: string
     type: object
 host: localhost:8000
 info:
@@ -11,7 +31,7 @@ info:
   title: WB API
   version: "1.0"
 paths:
-  /actors:
+  /api/actors:
     get:
       consumes:
       - application/json
@@ -22,7 +42,9 @@ paths:
           description: List of actors
           schema:
             items:
-              $ref: '#/definitions/domain.Actor'
+              items:
+                $ref: '#/definitions/dto.Actor'
+              type: array
             type: array
         "500":
           description: Internal server error
@@ -31,35 +53,7 @@ paths:
       summary: Retrieve all actors
       tags:
       - actors
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: Actor object to be created
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/domain.Actor'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Actor created successfully
-          schema:
-            $ref: '#/definitions/domain.Actor'
-        "400":
-          description: Bad request
-          schema:
-            type: string
-        "500":
-          description: Internal server error
-          schema:
-            type: string
-      summary: Create a new actor
-      tags:
-      - actors
-  /actors/{id}:
+  /api/actors/{id}:
     delete:
       consumes:
       - application/json
@@ -87,28 +81,24 @@ paths:
       summary: Delete an existing actor
       tags:
       - actors
-    put:
+  /api/create_actors:
+    post:
       consumes:
       - application/json
       parameters:
-      - description: Actor ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Actor object to be updated
+      - description: Actor object to be created
         in: body
         name: input
         required: true
         schema:
-          $ref: '#/definitions/domain.Actor'
+          $ref: '#/definitions/dto.Actor'
       produces:
       - application/json
       responses:
-        "200":
-          description: Actor updated successfully
+        "201":
+          description: Actor created successfully
           schema:
-            $ref: '#/definitions/domain.Actor'
+            $ref: '#/definitions/dto.Actor'
         "400":
           description: Bad request
           schema:
@@ -117,9 +107,38 @@ paths:
           description: Internal server error
           schema:
             type: string
-      summary: Update an existing actor
+      summary: Create a new actor
       tags:
       - actors
+  /api/create_films:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Film object to be created
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Film'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Film created successfully
+          schema:
+            $ref: '#/definitions/dto.Film'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Create a new film
+      tags:
+      - films
   /api/films:
     get:
       consumes:
@@ -131,41 +150,15 @@ paths:
           description: List of films
           schema:
             items:
-              $ref: '#/definitions/domain.Film'
+              items:
+                $ref: '#/definitions/dto.Film'
+              type: array
             type: array
         "500":
           description: Internal server error
           schema:
             type: string
       summary: Retrieve all films
-      tags:
-      - films
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: Film object to be created
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/domain.Film'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Film created successfully
-          schema:
-            $ref: '#/definitions/domain.Film'
-        "400":
-          description: Bad request
-          schema:
-            type: string
-        "500":
-          description: Internal server error
-          schema:
-            type: string
-      summary: Create a new film
       tags:
       - films
   /api/films/{id}:
@@ -196,6 +189,41 @@ paths:
       summary: Delete an existing film
       tags:
       - films
+  /api/update_actors:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Actor ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Actor object to be updated
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Actor'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Actor updated successfully
+          schema:
+            $ref: '#/definitions/dto.Actor'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Update an existing actor
+      tags:
+      - actors
+  /api/update_films:
     put:
       consumes:
       - application/json
@@ -210,14 +238,14 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/domain.Film'
+          $ref: '#/definitions/dto.Film'
       produces:
       - application/json
       responses:
         "200":
           description: Film updated successfully
           schema:
-            $ref: '#/definitions/domain.Film'
+            $ref: '#/definitions/dto.Film'
         "400":
           description: Bad request
           schema:

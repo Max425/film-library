@@ -39,14 +39,14 @@ func NewHttpServer(log *zap.Logger, postgres config.PostgresConfig, listenAddr s
 	))
 
 	// Actors endpoints
-	mux.HandleFunc("/api/actors", h.Use(h.CreateActor))
-	mux.HandleFunc("/api/actors/{id}", h.Use(h.UpdateActor))
+	mux.HandleFunc("/api/create_actors", h.Use(h.CreateActor))
+	mux.HandleFunc("/api/update_actors", h.Use(h.UpdateActor))
 	mux.HandleFunc("/api/actors/{id}", h.Use(h.DeleteActor))
 	mux.HandleFunc("/api/actors", h.Use(h.GetAllActors))
 
 	// Films endpoints
-	mux.HandleFunc("/api/films", h.Use(h.CreateFilm))
-	mux.HandleFunc("/api/films/{id}", h.Use(h.UpdateFilm))
+	mux.HandleFunc("/api/create_films", h.Use(h.CreateFilm))
+	mux.HandleFunc("/api/update_films", h.Use(h.UpdateFilm))
 	mux.HandleFunc("/api/films/{id}", h.Use(h.DeleteFilm))
 	mux.HandleFunc("/api/films", h.Use(h.GetAllFilms))
 

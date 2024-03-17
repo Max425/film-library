@@ -36,11 +36,11 @@ func NewActorHandler(log *zap.Logger, actorService ActorService) *ActorHandler {
 // @Tags actors
 // @Accept json
 // @Produce json
-// @Param input body domain.Actor true "Actor object to be created"
-// @Success 201 {object} domain.Actor "Actor created successfully"
+// @Param input body dto.Actor true "Actor object to be created"
+// @Success 201 {object} dto.Actor "Actor created successfully"
 // @Failure 400 {string} string "Bad request"
 // @Failure 500 {string} string "Internal server error"
-// @Router /actors [post]
+// @Router /api/create_actors [post]
 func (h *ActorHandler) CreateActor(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed))
@@ -73,11 +73,11 @@ func (h *ActorHandler) CreateActor(w http.ResponseWriter, r *http.Request) {
 // @Accept json
 // @Produce json
 // @Param id path int true "Actor ID"
-// @Param input body domain.Actor true "Actor object to be updated"
-// @Success 200 {object} domain.Actor "Actor updated successfully"
+// @Param input body dto.Actor true "Actor object to be updated"
+// @Success 200 {object} dto.Actor "Actor updated successfully"
 // @Failure 400 {string} string "Bad request"
 // @Failure 500 {string} string "Internal server error"
-// @Router /actors/{id} [put]
+// @Router /api/update_actors [put]
 func (h *ActorHandler) UpdateActor(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPut {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed))
@@ -113,7 +113,7 @@ func (h *ActorHandler) UpdateActor(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {string} string "Actor deleted successfully"
 // @Failure 400 {string} string "Bad request"
 // @Failure 500 {string} string "Internal server error"
-// @Router /actors/{id} [delete]
+// @Router /api/actors/{id} [delete]
 func (h *ActorHandler) DeleteActor(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodDelete {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed))
@@ -139,9 +139,9 @@ func (h *ActorHandler) DeleteActor(w http.ResponseWriter, r *http.Request) {
 // @Tags actors
 // @Accept json
 // @Produce json
-// @Success 200 {array} domain.Actor "List of actors"
+// @Success 200 {array} []dto.Actor "List of actors"
 // @Failure 500 {string} string "Internal server error"
-// @Router /actors [get]
+// @Router /api/actors [get]
 func (h *ActorHandler) GetAllActors(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed))

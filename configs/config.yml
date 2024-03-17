@@ -1,9 +1,11 @@
-port: "8000"
+server:
+  host: "localhost"
+  port: "8000"
 
 db:
   username: "postgres"
-  host: "db"
+  host: "localhost"
   port: "5432"
-  dbname: "postgres"
+  dbname: "filmoteka"
   sslmode: "disable"
   password: "postgres"

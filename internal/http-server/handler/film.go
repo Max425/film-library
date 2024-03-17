@@ -35,11 +35,11 @@ func NewFilmHandler(log *zap.Logger, filmService FilmService) *FilmHandler {
 // @Tags films
 // @Accept json
 // @Produce json
-// @Param input body domain.Film true "Film object to be created"
-// @Success 201 {object} domain.Film "Film created successfully"
+// @Param input body dto.Film true "Film object to be created"
+// @Success 201 {object} dto.Film "Film created successfully"
 // @Failure 400 {string} string "Bad request"
 // @Failure 500 {string} string "Internal server error"
-// @Router /api/films [post]
+// @Router /api/create_films [post]
 func (h *FilmHandler) CreateFilm(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed))
@@ -73,11 +73,11 @@ func (h *FilmHandler) CreateFilm(w http.ResponseWriter, r *http.Request) {
 // @Accept json
 // @Produce json
 // @Param id path int true "Film ID"
-// @Param input body domain.Film true "Film object to be updated"
-// @Success 200 {object} domain.Film "Film updated successfully"
+// @Param input body dto.Film true "Film object to be updated"
+// @Success 200 {object} dto.Film "Film updated successfully"
 // @Failure 400 {string} string "Bad request"
 // @Failure 500 {string} string "Internal server error"
-// @Router /api/films/{id} [put]
+// @Router /api/update_films [put]
 func (h *FilmHandler) UpdateFilm(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPut {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed))
@@ -142,7 +142,7 @@ func (h *FilmHandler) DeleteFilm(w http.ResponseWriter, r *http.Request) {
 // @Tags films
 // @Accept json
 // @Produce json
-// @Success 200 {array} domain.Film "List of films"
+// @Success 200 {array} []dto.Film "List of films"
 // @Failure 500 {string} string "Internal server error"
 // @Router /api/films [get]
 func (h *FilmHandler) GetAllFilms(w http.ResponseWriter, r *http.Request) {

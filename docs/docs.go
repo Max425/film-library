@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/actors": {
+        "/api/actors": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -33,51 +33,11 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/domain.Actor"
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/dto.Actor"
+                                }
                             }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "actors"
-                ],
-                "summary": "Create a new actor",
-                "parameters": [
-                    {
-                        "description": "Actor object to be created",
-                        "name": "input",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/domain.Actor"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Actor created successfully",
-                        "schema": {
-                            "$ref": "#/definitions/domain.Actor"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request",
-                        "schema": {
-                            "type": "string"
                         }
                     },
                     "500": {
@@ -89,57 +49,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/actors/{id}": {
-            "put": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "actors"
-                ],
-                "summary": "Update an existing actor",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Actor ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Actor object to be updated",
-                        "name": "input",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/domain.Actor"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Actor updated successfully",
-                        "schema": {
-                            "$ref": "#/definitions/domain.Actor"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            },
+        "/api/actors/{id}": {
             "delete": {
                 "consumes": [
                     "application/json"
@@ -182,8 +92,8 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/films": {
-            "get": {
+        "/api/create_actors": {
+            "post": {
                 "consumes": [
                     "application/json"
                 ],
@@ -191,17 +101,31 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "films"
+                    "actors"
                 ],
-                "summary": "Retrieve all films",
-                "responses": {
-                    "200": {
-                        "description": "List of films",
+                "summary": "Create a new actor",
+                "parameters": [
+                    {
+                        "description": "Actor object to be created",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/domain.Film"
-                            }
+                            "$ref": "#/definitions/dto.Actor"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Actor created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Actor"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
                         }
                     },
                     "500": {
@@ -211,7 +135,9 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
+            }
+        },
+        "/api/create_films": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -230,7 +156,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/domain.Film"
+                            "$ref": "#/definitions/dto.Film"
                         }
                     }
                 ],
@@ -238,7 +164,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Film created successfully",
                         "schema": {
-                            "$ref": "#/definitions/domain.Film"
+                            "$ref": "#/definitions/dto.Film"
                         }
                     },
                     "400": {
@@ -256,8 +182,8 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/films/{id}": {
-            "put": {
+        "/api/films": {
+            "get": {
                 "consumes": [
                     "application/json"
                 ],
@@ -267,36 +193,18 @@ const docTemplate = `{
                 "tags": [
                     "films"
                 ],
-                "summary": "Update an existing film",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Film ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Film object to be updated",
-                        "name": "input",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/domain.Film"
-                        }
-                    }
-                ],
+                "summary": "Retrieve all films",
                 "responses": {
                     "200": {
-                        "description": "Film updated successfully",
+                        "description": "List of films",
                         "schema": {
-                            "$ref": "#/definitions/domain.Film"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request",
-                        "schema": {
-                            "type": "string"
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/dto.Film"
+                                }
+                            }
                         }
                     },
                     "500": {
@@ -306,7 +214,9 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
+            }
+        },
+        "/api/films/{id}": {
             "delete": {
                 "consumes": [
                     "application/json"
@@ -348,14 +258,149 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/api/update_actors": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "actors"
+                ],
+                "summary": "Update an existing actor",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Actor ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Actor object to be updated",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.Actor"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Actor updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Actor"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/update_films": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "films"
+                ],
+                "summary": "Update an existing film",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Film ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Film object to be updated",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.Film"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Film updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Film"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
-        "domain.Actor": {
-            "type": "object"
+        "dto.Actor": {
+            "type": "object",
+            "properties": {
+                "birth_date": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
         },
-        "domain.Film": {
-            "type": "object"
+        "dto.Film": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "rating": {
+                    "type": "number"
+                },
+                "release_date": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
         }
     }
 }`
