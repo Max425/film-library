@@ -1,0 +1,180 @@
+basePath: /
+definitions:
+  core.Event:
+    properties:
+      date:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+      user_id:
+        type: string
+    type: object
+host: localhost:8000
+info:
+  contact: {}
+  description: API Server for WB-level-0 Application
+  title: WB API
+  version: "1.0"
+paths:
+  /create_event:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: New event
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/core.Event'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: create event
+      tags:
+      - event
+  /delete_event:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Event ID
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/core.Event'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: delete event
+      tags:
+      - event
+  /events_for_day:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/core.Event'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: get events for day
+      tags:
+      - event
+  /events_for_month:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/core.Event'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: get events for month
+      tags:
+      - event
+  /events_for_week:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/core.Event'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: get events for week
+      tags:
+      - event
+  /update_event:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Updated event
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/core.Event'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: update event
+      tags:
+      - event
+swagger: "2.0"
