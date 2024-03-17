@@ -19,8 +19,7 @@ func FilmDtoToDomain(dtoFilm *Film) (*domain.Film, error) {
 }
 
 func FilmDomainToDto(domainFilm *domain.Film) *Film {
-	domainFilm.
-		actorsDTOs := make([]*Film, len(domainFilm.GetActors()))
+	actorsDTOs := make([]*Actor, len(domainFilm.GetActors()))
 	for i, actor := range domainFilm.GetActors() {
 		actorsDTOs[i] = ActorDomainToDto(actor)
 	}
@@ -31,5 +30,6 @@ func FilmDomainToDto(domainFilm *domain.Film) *Film {
 		Description: domainFilm.GetDescription(),
 		ReleaseDate: domainFilm.GetReleaseDate(),
 		Rating:      domainFilm.GetRating(),
+		Actors:      actorsDTOs,
 	}
 }

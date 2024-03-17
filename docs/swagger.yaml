@@ -1,15 +1,8 @@
 basePath: /
 definitions:
-  core.Event:
-    properties:
-      date:
-        type: string
-      id:
-        type: integer
-      title:
-        type: string
-      user_id:
-        type: string
+  domain.Actor:
+    type: object
+  domain.Film:
     type: object
 host: localhost:8000
 info:
@@ -18,65 +11,7 @@ info:
   title: WB API
   version: "1.0"
 paths:
-  /create_event:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: New event
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/core.Event'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: integer
-        "400":
-          description: Bad Request
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            type: string
-      summary: create event
-      tags:
-      - event
-  /delete_event:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: Event ID
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/core.Event'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-        "400":
-          description: Bad Request
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            type: string
-      summary: delete event
-      tags:
-      - event
-  /events_for_day:
+  /actors:
     get:
       consumes:
       - application/json
@@ -84,97 +19,214 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: List of actors
           schema:
             items:
-              $ref: '#/definitions/core.Event'
+              $ref: '#/definitions/domain.Actor'
             type: array
-        "400":
-          description: Bad Request
-          schema:
-            type: string
         "500":
-          description: Internal Server Error
+          description: Internal server error
           schema:
             type: string
-      summary: get events for day
+      summary: Retrieve all actors
       tags:
-      - event
-  /events_for_month:
-    get:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/core.Event'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            type: string
-      summary: get events for month
-      tags:
-      - event
-  /events_for_week:
-    get:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/core.Event'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            type: string
-      summary: get events for week
-      tags:
-      - event
-  /update_event:
+      - actors
     post:
       consumes:
       - application/json
       parameters:
-      - description: Updated event
+      - description: Actor object to be created
         in: body
         name: input
         required: true
         schema:
-          $ref: '#/definitions/core.Event'
+          $ref: '#/definitions/domain.Actor'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Actor created successfully
+          schema:
+            $ref: '#/definitions/domain.Actor'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Create a new actor
+      tags:
+      - actors
+  /actors/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Actor ID
+        in: path
+        name: id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Actor deleted successfully
           schema:
             type: string
         "400":
-          description: Bad Request
+          description: Bad request
           schema:
             type: string
         "500":
-          description: Internal Server Error
+          description: Internal server error
           schema:
             type: string
-      summary: update event
+      summary: Delete an existing actor
       tags:
-      - event
+      - actors
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Actor ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Actor object to be updated
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Actor'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Actor updated successfully
+          schema:
+            $ref: '#/definitions/domain.Actor'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Update an existing actor
+      tags:
+      - actors
+  /api/films:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of films
+          schema:
+            items:
+              $ref: '#/definitions/domain.Film'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Retrieve all films
+      tags:
+      - films
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Film object to be created
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Film'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Film created successfully
+          schema:
+            $ref: '#/definitions/domain.Film'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Create a new film
+      tags:
+      - films
+  /api/films/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Film ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Film deleted successfully
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Delete an existing film
+      tags:
+      - films
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Film ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Film object to be updated
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Film'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Film updated successfully
+          schema:
+            $ref: '#/definitions/domain.Film'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Update an existing film
+      tags:
+      - films
 swagger: "2.0"

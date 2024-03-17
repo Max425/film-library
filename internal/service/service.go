@@ -2,24 +2,21 @@ package service
 
 import (
 	"go.uber.org/zap"
-	"time"
 )
 
-//go:generate mockgen -source=service.go -destination=mocks/mock.go
-
-type Event interface {
-	CreateEvent(event *core.Event) (int, error)
-	UpdateEvent(event *core.Event) error
-	DeleteEvent(id int) error
-	GetEventsForTime(date time.Duration) ([]core.Event, error)
+type Repository interface {
+	ActorRepository
+	FilmRepository
 }
 
 type Service struct {
-	Event
+	ActorService
+	FilmService
 }
 
-func NewService(repo *repository.Repository, log *zap.Logger) *Service {
+func NewService(repo Repository, log *zap.Logger) *Service {
 	return &Service{
-		Event: NewEventService(repo.Event, log),
+		*NewActorService(repo, log),
+		*NewFilmService(repo, log),
 	}
 }

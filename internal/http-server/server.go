@@ -14,7 +14,7 @@ import (
 )
 
 type Service interface {
-	handler.CompanyService
+	handler.FilmService
 }
 
 func NewHttpServer(log *zap.Logger, postgres config.PostgresConfig, listenAddr string) (*http.Server, error) {
@@ -25,32 +25,33 @@ func NewHttpServer(log *zap.Logger, postgres config.PostgresConfig, listenAddr s
 	}
 
 	// create all repositories
-	managerRepo := repository.NewRepository(dbConnect, log)
+	repositories := repository.NewRepository(dbConnect, log)
 
 	// create all services
-	managerService := service.NewService(managerRepo, log)
+	services := service.NewService(repositories, log)
 
-	r := http.NewServeMux()
+	h := handler.NewHandler(services, log)
 
-	r.Handle("/swagger/", httpSwagger.Handler(
+	mux := http.NewServeMux()
+
+	mux.Handle("/swagger/", httpSwagger.Handler(
 		httpSwagger.URL(fmt.Sprintf("%s/swagger/doc.json", constants.Host)),
 	))
 
-	r.HandleFunc("/create_event", h.Use(h.createEvent))
-	r.HandleFunc("/update_event", h.Use(h.updateEvent))
-	r.HandleFunc("/delete_event", h.Use(h.deleteEvent))
-	r.HandleFunc("/events_for_day", h.Use(h.getEventsForDay))
-	r.HandleFunc("/events_for_week", h.Use(h.getEventsForWeek))
-	r.HandleFunc("/events_for_month", h.Use(h.getEventsForMonth))
+	// Actors endpoints
+	mux.HandleFunc("/api/actors", h.Use(h.CreateActor))
+	mux.HandleFunc("/api/actors/{id}", h.Use(h.UpdateActor))
+	mux.HandleFunc("/api/actors/{id}", h.Use(h.DeleteActor))
+	mux.HandleFunc("/api/actors", h.Use(h.GetAllActors))
+
+	// Films endpoints
+	mux.HandleFunc("/api/films", h.Use(h.CreateFilm))
+	mux.HandleFunc("/api/films/{id}", h.Use(h.UpdateFilm))
+	mux.HandleFunc("/api/films/{id}", h.Use(h.DeleteFilm))
+	mux.HandleFunc("/api/films", h.Use(h.GetAllFilms))
 
 	return &http.Server{
 		Addr:    listenAddr,
-		Handler: router,
+		Handler: mux,
 	}, nil
-}
-
-func (h *Handler) Use(next http.HandlerFunc) http.HandlerFunc {
-	return h.panicRecoveryMiddleware(
-		h.loggingMiddleware(next),
-	)
 }

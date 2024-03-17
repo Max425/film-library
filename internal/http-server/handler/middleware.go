@@ -27,7 +27,7 @@ func (h *Handler) loggingMiddleware(next http.Handler) http.HandlerFunc {
 			code = requestInfo.Status
 		}
 
-		h.logger.Info("Request handled",
+		h.log.Info("Request handled",
 			zap.Int("StatusCode", code),
 			zap.String("RequestURI", r.RequestURI),
 			zap.Duration("Time", timing),
@@ -39,7 +39,7 @@ func (h *Handler) panicRecoveryMiddleware(next http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if err := recover(); err != nil {
-				h.logger.Error("Panic",
+				h.log.Error("Panic",
 					zap.String("Method", r.Method),
 					zap.String("RequestURI", r.RequestURI),
 					zap.String("Error", err.(string)),
