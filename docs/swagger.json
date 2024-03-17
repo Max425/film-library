@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "API Server for WB-level-0 Application",
+        "description": "API Server for Film Library",
         "title": "WB API",
         "contact": {},
         "version": "1.0"

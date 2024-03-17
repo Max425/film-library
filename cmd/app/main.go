@@ -17,7 +17,7 @@ import (
 
 // @title WB API
 // @version 1.0
-// @description API Server for WB-level-0 Application
+// @description API Server for Film Library
 
 // @host localhost:8000
 // @BasePath /

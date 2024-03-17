@@ -412,7 +412,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "WB API",
-	Description:      "API Server for WB-level-0 Application",
+	Description:      "API Server for Film Library",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }
