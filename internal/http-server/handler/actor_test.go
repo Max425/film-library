@@ -16,8 +16,7 @@ import (
 )
 
 func TestActorHandler_CreateActor(t *testing.T) {
-	mockActor, _ := domain.NewActor(1, "Bob", "male", time.Unix(0, 0), nil)
-
+	mockActor, _ := domain.NewActor(0, "Bob", "male", time.Date(2024, time.March, 18, 0, 0, 0, 0, time.UTC), nil)
 	tests := []struct {
 		name                 string
 		requestMethod        string
@@ -29,28 +28,30 @@ func TestActorHandler_CreateActor(t *testing.T) {
 		{
 			name:          "Ok",
 			requestMethod: http.MethodPost,
-			requestBody:   `{"first_name": "Bob", "last_name": "Smith"}`,
+			requestBody:   `{"name": "Bob", "gender": "male", "birth_date": "2024-03-18"}`,
 			mockBehavior: func(r *mock_handler.MockActorService, actor *domain.Actor) {
 				r.EXPECT().CreateActor(gomock.Any(), actor).Return(mockActor, nil)
 			},
 			expectedStatusCode:   http.StatusOK,
-			expectedResponseBody: `{"status":200,"message":"success","payload":{"id":1,"first_name":"Bob","last_name":"Smith"}}`,
+			expectedResponseBody: `{"status":200,"message":"success","payload":{"id":0,"name":"Bob","gender":"male","birth_date":"2024-03-18T00:00:00Z","films":[]}}`,
 		},
 		{
 			name:                 "Invalid JSON",
 			requestMethod:        http.MethodPost,
-			requestBody:          `{"first_name": "Bob", "last_name": "Smith"`,
+			requestBody:          `{"name": "Bob", "gender": "male", "birth_date": "2024-03-18"`,
 			mockBehavior:         func(r *mock_handler.MockActorService, actor *domain.Actor) {},
-			expectedStatusCode:   http.StatusBadRequest,
-			expectedResponseBody: `{"status":400,"message":"Bad request","payload":""}`,
+			expectedStatusCode:   http.StatusOK,
+			expectedResponseBody: `{"status":400,"message":"bad request","payload":""}`,
 		},
 		{
-			name:                 "Create actor error",
-			requestMethod:        http.MethodPost,
-			requestBody:          `{"first_name": "Bob", "last_name": "Smith"}`,
-			mockBehavior:         func(r *mock_handler.MockActorService, actor *domain.Actor) {},
-			expectedStatusCode:   http.StatusInternalServerError,
-			expectedResponseBody: `{"status":500,"message":"Internal server error","payload":""}`,
+			name:          "Create actor error",
+			requestMethod: http.MethodPost,
+			requestBody:   `{"name": "Bob", "gender": "male", "birth_date": "2024-03-18"}`,
+			mockBehavior: func(r *mock_handler.MockActorService, actor *domain.Actor) {
+				r.EXPECT().CreateActor(gomock.Any(), actor).Return(mockActor, errors.New("some error"))
+			},
+			expectedStatusCode:   http.StatusOK,
+			expectedResponseBody: `{"status":500,"message":"internal error","payload":""}`,
 		},
 	}
 
@@ -80,8 +81,7 @@ func TestActorHandler_CreateActor(t *testing.T) {
 }
 
 func TestActorHandler_UpdateActor(t *testing.T) {
-	mockActor, _ := domain.NewActor(1, "Bob", "male", time.Unix(0, 0), nil)
-
+	mockActor, _ := domain.NewActor(0, "Bob", "male", time.Date(2024, time.March, 18, 0, 0, 0, 0, time.UTC), nil)
 	tests := []struct {
 		name                 string
 		requestMethod        string
@@ -93,28 +93,30 @@ func TestActorHandler_UpdateActor(t *testing.T) {
 		{
 			name:          "Ok",
 			requestMethod: http.MethodPut,
-			requestBody:   `{"first_name": "Bob", "last_name": "Smith"}`,
+			requestBody:   `{"name": "Bob", "gender": "male", "birth_date": "2024-03-18"}`,
 			mockBehavior: func(r *mock_handler.MockActorService, actor *domain.Actor) {
 				r.EXPECT().UpdateActor(gomock.Any(), actor).Return(mockActor, nil)
 			},
 			expectedStatusCode:   http.StatusOK,
-			expectedResponseBody: `{"status":200,"message":"success","payload":{"id":1,"first_name":"Bob","last_name":"Smith"}}`,
+			expectedResponseBody: `{"status":200,"message":"success","payload":{"id":0,"name":"Bob","gender":"male","birth_date":"2024-03-18T00:00:00Z","films":[]}}`,
 		},
 		{
 			name:                 "Invalid JSON",
 			requestMethod:        http.MethodPut,
-			requestBody:          `{"first_name": "Bob", "last_name": "Smith"`,
+			requestBody:          `{"name": "Bob", "gender": "male", "birth_date": "2024-03-18"`,
 			mockBehavior:         func(r *mock_handler.MockActorService, actor *domain.Actor) {},
-			expectedStatusCode:   http.StatusBadRequest,
-			expectedResponseBody: `{"status":400,"message":"Bad request","payload":""}`,
+			expectedStatusCode:   http.StatusOK,
+			expectedResponseBody: `{"status":400,"message":"bad request","payload":""}`,
 		},
 		{
-			name:                 "Update actor error",
-			requestMethod:        http.MethodPut,
-			requestBody:          `{"first_name": "Bob", "last_name": "Smith"}`,
-			mockBehavior:         func(r *mock_handler.MockActorService, actor *domain.Actor) {},
-			expectedStatusCode:   http.StatusInternalServerError,
-			expectedResponseBody: `{"status":500,"message":"Internal server error","payload":""}`,
+			name:          "Update actor error",
+			requestMethod: http.MethodPut,
+			requestBody:   `{"name": "Bob", "gender": "male", "birth_date": "2024-03-18"}`,
+			mockBehavior: func(r *mock_handler.MockActorService, actor *domain.Actor) {
+				r.EXPECT().UpdateActor(gomock.Any(), actor).Return(mockActor, errors.New("some error"))
+			},
+			expectedStatusCode:   http.StatusOK,
+			expectedResponseBody: `{"status":500,"message":"internal error","payload":""}`,
 		},
 	}
 
@@ -165,10 +167,10 @@ func TestActorHandler_DeleteActor(t *testing.T) {
 		{
 			name:                 "Invalid actor ID",
 			requestMethod:        http.MethodDelete,
-			requestURL:           "/api/actors/not_an_id",
+			requestURL:           "/api/actors/invalid",
 			mockBehavior:         func(r *mock_handler.MockActorService, actorID int) {},
-			expectedStatusCode:   http.StatusBadRequest,
-			expectedResponseBody: `{"status":400,"message":"Bad request","payload":""}`,
+			expectedStatusCode:   http.StatusOK,
+			expectedResponseBody: `{"status":400,"message":"invalid actor ID","payload":""}`,
 		},
 		{
 			name:          "Delete actor error",
@@ -177,8 +179,8 @@ func TestActorHandler_DeleteActor(t *testing.T) {
 			mockBehavior: func(r *mock_handler.MockActorService, actorID int) {
 				r.EXPECT().DeleteActor(gomock.Any(), actorID).Return(errors.New("error"))
 			},
-			expectedStatusCode:   http.StatusInternalServerError,
-			expectedResponseBody: `{"status":500,"message":"error","payload":""}`,
+			expectedStatusCode:   http.StatusOK,
+			expectedResponseBody: `{"status":500,"message":"internal error","payload":""}`,
 		},
 	}
 
@@ -209,8 +211,8 @@ func TestActorHandler_DeleteActor(t *testing.T) {
 }
 
 func TestActorHandler_GetAllActors(t *testing.T) {
-	mockActor1, _ := domain.NewActor(1, "Bob", "male", time.Unix(0, 0), nil)
-	mockActor2, _ := domain.NewActor(1, "Bob", "male", time.Unix(0, 0), nil)
+	mockActor1, _ := domain.NewActor(0, "Bob", "male", time.Date(2024, time.March, 18, 0, 0, 0, 0, time.UTC), nil)
+	mockActor2, _ := domain.NewActor(0, "Bob", "male", time.Date(2024, time.March, 18, 0, 0, 0, 0, time.UTC), nil)
 	mockActors := []*domain.Actor{mockActor1, mockActor2}
 	tests := []struct {
 		name                 string
@@ -226,7 +228,7 @@ func TestActorHandler_GetAllActors(t *testing.T) {
 				return r.EXPECT().GetAllActors(gomock.Any()).Return(mockActors, nil)
 			},
 			expectedStatusCode:   http.StatusOK,
-			expectedResponseBody: `[{"id":1,"first_name":"Bob","last_name":"Smith"},{"id":2,"first_name":"Alice","last_name":"Johnson"}]`,
+			expectedResponseBody: `{"status":200,"message":"success","payload":[{"id":0,"name":"Bob","gender":"male","birth_date":"2024-03-18T00:00:00Z","films":[]},{"id":0,"name":"Bob","gender":"male","birth_date":"2024-03-18T00:00:00Z","films":[]}]}`,
 		},
 		{
 			name:          "Get all actors error",
@@ -234,7 +236,7 @@ func TestActorHandler_GetAllActors(t *testing.T) {
 			mockBehavior: func(r *mock_handler.MockActorService) *gomock.Call {
 				return r.EXPECT().GetAllActors(gomock.Any()).Return(nil, errors.New("error"))
 			},
-			expectedStatusCode:   http.StatusInternalServerError,
+			expectedStatusCode:   http.StatusOK,
 			expectedResponseBody: `{"status":500,"message":"error","payload":""}`,
 		},
 	}

@@ -145,7 +145,7 @@ func (h *ActorHandler) DeleteActor(w http.ResponseWriter, r *http.Request) {
 			dto.NewErrorClientResponseDto(r.Context(), w, http.StatusNotFound, common.ErrNotFound.String())
 			return
 		}
-		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
+		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, common.ErrInternal.String())
 		return
 	}
 
