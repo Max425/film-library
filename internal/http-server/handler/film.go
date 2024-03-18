@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"github.com/Max425/film-library.git/internal/common"
 	"github.com/Max425/film-library.git/internal/domain"
@@ -16,6 +17,7 @@ type FilmService interface {
 	CreateFilm(ctx context.Context, film *domain.Film) (*domain.Film, error)
 	GetFilmByID(ctx context.Context, id int) (*domain.Film, error)
 	UpdateFilm(ctx context.Context, film *domain.Film) (*domain.Film, error)
+	UpdateFilmActors(ctx context.Context, id int, actorsId []int) (*domain.Film, error)
 	DeleteFilm(ctx context.Context, id int) error
 	GetAllFilms(ctx context.Context) ([]*domain.Film, error)
 }
@@ -104,6 +106,52 @@ func (h *FilmHandler) UpdateFilm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	updatedFilm, err := h.filmService.UpdateFilm(r.Context(), domainFilm)
+	if err != nil {
+		h.log.Error("Failed to update film", zap.Error(err))
+		if errors.Is(err, domain.ErrNotFound) {
+			dto.NewErrorClientResponseDto(r.Context(), w, http.StatusNotFound, common.ErrNotFound.String())
+			return
+		}
+		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, common.ErrInternal.String())
+		return
+	}
+
+	dto.NewSuccessClientResponseDto(r.Context(), w, dto.FilmDomainToDto(updatedFilm))
+}
+
+// UpdateFilmActors updates an existing film.
+// @Summary Update an existing film
+// @Tags films
+// @Accept json
+// @Produce json
+// @Param id path int true "Film ID"
+// @Param input body []int true "id actors for film"
+// @Success 200 {object} dto.Film "Film updated successfully"
+// @Failure 400 {string} string "Bad request"
+// @Failure 500 {string} string "Internal server error"
+// @Router /api/update_films_actors/{id} [post]
+func (h *FilmHandler) UpdateFilmActors(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed))
+		return
+	}
+
+	idStr := r.URL.Path[len("/api/update_films_actors/"):]
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid film ID")
+		return
+	}
+
+	var actorsId []int
+	body, _ := io.ReadAll(r.Body)
+	if err := json.Unmarshal(body, &actorsId); err != nil {
+		h.log.Error("Failed to decode film", zap.Error(err))
+		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, common.ErrBadRequest.String())
+		return
+	}
+
+	updatedFilm, err := h.filmService.UpdateFilmActors(r.Context(), id, actorsId)
 	if err != nil {
 		h.log.Error("Failed to update film", zap.Error(err))
 		if errors.Is(err, domain.ErrNotFound) {

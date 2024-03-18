@@ -59,6 +59,25 @@ func (r *FilmRepository) UpdateFilm(ctx context.Context, film *domain.Film) (*do
 	return film, nil
 }
 
+func (r *FilmRepository) UpdateFilmActors(ctx context.Context, id int, actorsID []int) (*domain.Film, error) {
+	deleteQuery := `DELETE FROM film_actor WHERE film_id = $1`
+	_, err := r.db.ExecContext(ctx, deleteQuery, id)
+	if err != nil {
+		r.logger.Error("Failed to delete film actors", zap.Error(err))
+		return nil, err
+	}
+
+	for _, actorID := range actorsID {
+		insertQuery := `INSERT INTO film_actor (film_id, actor_id) VALUES ($1, $2)`
+		_, err = r.db.ExecContext(ctx, insertQuery, id, actorID)
+		if err != nil {
+			r.logger.Error("Failed to insert film actor", zap.Error(err))
+		}
+	}
+
+	return r.FindFilmByID(ctx, id)
+}
+
 func (r *FilmRepository) DeleteFilm(ctx context.Context, id int) error {
 	query := `DELETE FROM film WHERE id = $1`
 	_, err := r.db.ExecContext(ctx, query, id)

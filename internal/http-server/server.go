@@ -57,6 +57,7 @@ func NewHttpServer(log *zap.Logger, postgres config.PostgresConfig, redis config
 	// Films endpoints
 	mux.HandleFunc("/api/create_films", h.UseRecoveryLoggingAuth(h.CreateFilm))
 	mux.HandleFunc("/api/update_films", h.UseRecoveryLoggingAuth(h.UpdateFilm))
+	mux.HandleFunc("/api/update_films_actors/", h.UseRecoveryLoggingAuth(h.UpdateFilmActors))
 	mux.HandleFunc("/api/films/", h.UseRecoveryLoggingAuth(h.DeleteFilm))
 	mux.HandleFunc("/api/films", h.UseRecoveryLoggingAuth(h.GetAllFilms))
 

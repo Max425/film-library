@@ -355,4 +355,40 @@ paths:
       summary: Update an existing film
       tags:
       - films
+  /api/update_films_actors/{id}:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Film ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: id actors for film
+        in: body
+        name: input
+        required: true
+        schema:
+          items:
+            type: integer
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Film updated successfully
+          schema:
+            $ref: '#/definitions/dto.Film'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Update an existing film
+      tags:
+      - films
 swagger: "2.0"

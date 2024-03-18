@@ -10,6 +10,7 @@ type FilmRepository interface {
 	CreateFilm(ctx context.Context, film *domain.Film) (*domain.Film, error)
 	FindFilmByID(ctx context.Context, id int) (*domain.Film, error)
 	UpdateFilm(ctx context.Context, film *domain.Film) (*domain.Film, error)
+	UpdateFilmActors(ctx context.Context, id int, actorsId []int) (*domain.Film, error)
 	DeleteFilm(ctx context.Context, id int) error
 	GetAllFilms(ctx context.Context) ([]*domain.Film, error)
 }
@@ -38,6 +39,15 @@ func (s *FilmService) UpdateFilm(ctx context.Context, film *domain.Film) (*domai
 	}
 
 	return s.filmRepo.UpdateFilm(ctx, film)
+}
+
+func (s *FilmService) UpdateFilmActors(ctx context.Context, id int, actorsId []int) (*domain.Film, error) {
+	_, err := s.filmRepo.FindFilmByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.filmRepo.UpdateFilmActors(ctx, id, actorsId)
 }
 
 func (s *FilmService) DeleteFilm(ctx context.Context, id int) error {
