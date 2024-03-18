@@ -17,5 +17,5 @@ type SignUpInput struct {
 }
 
 func SignUpInputToDomainUser(signUp *SignUpInput) (*domain.User, error) {
-	return domain.NewUser(0, signUp.Name, signUp.Mail, signUp.Password, "", constants.AdminRole)
+	return domain.NewUser(0, signUp.Name, signUp.Mail, signUp.Password, "", constants.UserRole)
 }
