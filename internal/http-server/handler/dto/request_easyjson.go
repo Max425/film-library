@@ -17,7 +17,7 @@ var (
 	_ easyjson.Marshaler
 )
 
-func easyjson3c9d2b01DecodeGithubComMax425WbschoolExamL2TreeMainDevelopDev11PkgModelDto(in *jlexer.Lexer, out *SuccessClientResponseDto) {
+func easyjson3c9d2b01DecodeGithubComMax425FilmLibraryGitInternalHttpServerHandlerDto(in *jlexer.Lexer, out *RequestInfo) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -36,14 +36,10 @@ func easyjson3c9d2b01DecodeGithubComMax425WbschoolExamL2TreeMainDevelopDev11PkgM
 			continue
 		}
 		switch key {
-		case "result":
-			if m, ok := out.Result.(easyjson.Unmarshaler); ok {
-				m.UnmarshalEasyJSON(in)
-			} else if m, ok := out.Result.(json.Unmarshaler); ok {
-				_ = m.UnmarshalJSON(in.Raw())
-			} else {
-				out.Result = in.Interface()
-			}
+		case "Status":
+			out.Status = int(in.Int())
+		case "Message":
+			out.Message = string(in.String())
 		default:
 			in.SkipRecursive()
 		}
@@ -54,48 +50,47 @@ func easyjson3c9d2b01DecodeGithubComMax425WbschoolExamL2TreeMainDevelopDev11PkgM
 		in.Consumed()
 	}
 }
-func easyjson3c9d2b01EncodeGithubComMax425WbschoolExamL2TreeMainDevelopDev11PkgModelDto(out *jwriter.Writer, in SuccessClientResponseDto) {
+func easyjson3c9d2b01EncodeGithubComMax425FilmLibraryGitInternalHttpServerHandlerDto(out *jwriter.Writer, in RequestInfo) {
 	out.RawByte('{')
 	first := true
 	_ = first
 	{
-		const prefix string = ",\"result\":"
+		const prefix string = ",\"Status\":"
 		out.RawString(prefix[1:])
-		if m, ok := in.Result.(easyjson.Marshaler); ok {
-			m.MarshalEasyJSON(out)
-		} else if m, ok := in.Result.(json.Marshaler); ok {
-			out.Raw(m.MarshalJSON())
-		} else {
-			out.Raw(json.Marshal(in.Result))
-		}
+		out.Int(int(in.Status))
+	}
+	{
+		const prefix string = ",\"Message\":"
+		out.RawString(prefix)
+		out.String(string(in.Message))
 	}
 	out.RawByte('}')
 }
 
 // MarshalJSON supports json.Marshaler interface
-func (v SuccessClientResponseDto) MarshalJSON() ([]byte, error) {
+func (v RequestInfo) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson3c9d2b01EncodeGithubComMax425WbschoolExamL2TreeMainDevelopDev11PkgModelDto(&w, v)
+	easyjson3c9d2b01EncodeGithubComMax425FilmLibraryGitInternalHttpServerHandlerDto(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
-func (v SuccessClientResponseDto) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson3c9d2b01EncodeGithubComMax425WbschoolExamL2TreeMainDevelopDev11PkgModelDto(w, v)
+func (v RequestInfo) MarshalEasyJSON(w *jwriter.Writer) {
+	easyjson3c9d2b01EncodeGithubComMax425FilmLibraryGitInternalHttpServerHandlerDto(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
-func (v *SuccessClientResponseDto) UnmarshalJSON(data []byte) error {
+func (v *RequestInfo) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson3c9d2b01DecodeGithubComMax425WbschoolExamL2TreeMainDevelopDev11PkgModelDto(&r, v)
+	easyjson3c9d2b01DecodeGithubComMax425FilmLibraryGitInternalHttpServerHandlerDto(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
-func (v *SuccessClientResponseDto) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson3c9d2b01DecodeGithubComMax425WbschoolExamL2TreeMainDevelopDev11PkgModelDto(l, v)
+func (v *RequestInfo) UnmarshalEasyJSON(l *jlexer.Lexer) {
+	easyjson3c9d2b01DecodeGithubComMax425FilmLibraryGitInternalHttpServerHandlerDto(l, v)
 }
-func easyjson3c9d2b01DecodeGithubComMax425WbschoolExamL2TreeMainDevelopDev11PkgModelDto1(in *jlexer.Lexer, out *ErrorClientResponseDto) {
+func easyjson3c9d2b01DecodeGithubComMax425FilmLibraryGitInternalHttpServerHandlerDto1(in *jlexer.Lexer, out *ClientResponseDto) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -114,13 +109,17 @@ func easyjson3c9d2b01DecodeGithubComMax425WbschoolExamL2TreeMainDevelopDev11PkgM
 			continue
 		}
 		switch key {
-		case "error":
-			if m, ok := out.Error.(easyjson.Unmarshaler); ok {
+		case "status":
+			out.Status = int(in.Int())
+		case "message":
+			out.Message = string(in.String())
+		case "payload":
+			if m, ok := out.Payload.(easyjson.Unmarshaler); ok {
 				m.UnmarshalEasyJSON(in)
-			} else if m, ok := out.Error.(json.Unmarshaler); ok {
+			} else if m, ok := out.Payload.(json.Unmarshaler); ok {
 				_ = m.UnmarshalJSON(in.Raw())
 			} else {
-				out.Error = in.Interface()
+				out.Payload = in.Interface()
 			}
 		default:
 			in.SkipRecursive()
@@ -132,44 +131,54 @@ func easyjson3c9d2b01DecodeGithubComMax425WbschoolExamL2TreeMainDevelopDev11PkgM
 		in.Consumed()
 	}
 }
-func easyjson3c9d2b01EncodeGithubComMax425WbschoolExamL2TreeMainDevelopDev11PkgModelDto1(out *jwriter.Writer, in ErrorClientResponseDto) {
+func easyjson3c9d2b01EncodeGithubComMax425FilmLibraryGitInternalHttpServerHandlerDto1(out *jwriter.Writer, in ClientResponseDto) {
 	out.RawByte('{')
 	first := true
 	_ = first
 	{
-		const prefix string = ",\"error\":"
+		const prefix string = ",\"status\":"
 		out.RawString(prefix[1:])
-		if m, ok := in.Error.(easyjson.Marshaler); ok {
+		out.Int(int(in.Status))
+	}
+	{
+		const prefix string = ",\"message\":"
+		out.RawString(prefix)
+		out.String(string(in.Message))
+	}
+	{
+		const prefix string = ",\"payload\":"
+		out.RawString(prefix)
+		if m, ok := in.Payload.(easyjson.Marshaler); ok {
 			m.MarshalEasyJSON(out)
-		} else if m, ok := in.Error.(json.Marshaler); ok {
+		} else if m, ok := in.Payload.(json.Marshaler); ok {
 			out.Raw(m.MarshalJSON())
 		} else {
-			out.Raw(json.Marshal(in.Error))
+			out.Raw(json.Marshal(in.Payload))
 		}
 	}
 	out.RawByte('}')
 }
 
 // MarshalJSON supports json.Marshaler interface
-func (v ErrorClientResponseDto) MarshalJSON() ([]byte, error) {
+func (v ClientResponseDto) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson3c9d2b01EncodeGithubComMax425WbschoolExamL2TreeMainDevelopDev11PkgModelDto1(&w, v)
+	easyjson3c9d2b01EncodeGithubComMax425FilmLibraryGitInternalHttpServerHandlerDto1(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
-func (v ErrorClientResponseDto) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson3c9d2b01EncodeGithubComMax425WbschoolExamL2TreeMainDevelopDev11PkgModelDto1(w, v)
+func (v ClientResponseDto) MarshalEasyJSON(w *jwriter.Writer) {
+	easyjson3c9d2b01EncodeGithubComMax425FilmLibraryGitInternalHttpServerHandlerDto1(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
-func (v *ErrorClientResponseDto) UnmarshalJSON(data []byte) error {
+func (v *ClientResponseDto) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson3c9d2b01DecodeGithubComMax425WbschoolExamL2TreeMainDevelopDev11PkgModelDto1(&r, v)
+	easyjson3c9d2b01DecodeGithubComMax425FilmLibraryGitInternalHttpServerHandlerDto1(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
-func (v *ErrorClientResponseDto) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson3c9d2b01DecodeGithubComMax425WbschoolExamL2TreeMainDevelopDev11PkgModelDto1(l, v)
+func (v *ClientResponseDto) UnmarshalEasyJSON(l *jlexer.Lexer) {
+	easyjson3c9d2b01DecodeGithubComMax425FilmLibraryGitInternalHttpServerHandlerDto1(l, v)
 }

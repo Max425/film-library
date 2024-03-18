@@ -1,13 +1,13 @@
 create table users
 (
     id            SERIAL PRIMARY KEY,
-    name          TEXT     NOT NULL,
+    name          TEXT                                     NOT NULL,
     mail          TEXT UNIQUE,
     password_hash TEXT,
     salt          TEXT,
-    role smallint check (role >= 0 and role <= 1) not null default 0,
-    created_at timestamptz default timezone('europe/moscow'::text, now()),
-    updated_at timestamptz default timezone('europe/moscow'::text, now())
+    role          smallint check (role >= 0 and role <= 1) not null default 0,
+    created_at    timestamptz                                       default timezone('europe/moscow'::text, now()),
+    updated_at    timestamptz                                       default timezone('europe/moscow'::text, now())
 );
 
 create index inx_users_mail on users (mail);

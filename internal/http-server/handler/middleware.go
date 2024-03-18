@@ -57,12 +57,16 @@ func (h *Middleware) loggingMiddleware(next http.Handler) http.HandlerFunc {
 
 		requestInfo, ok := ctx.Value(constants.KeyRequestInfo).(*dto.RequestInfo)
 		var code int
+		var message string
 		if ok {
 			code = requestInfo.Status
+			message = requestInfo.Message
+
 		}
 
 		h.log.Info("Request handled",
 			zap.Int("StatusCode", code),
+			zap.String("Message", message),
 			zap.String("RequestURI", r.RequestURI),
 			zap.Duration("Time", timing),
 		)

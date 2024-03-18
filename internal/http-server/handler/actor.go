@@ -2,11 +2,11 @@ package handler
 
 import (
 	"context"
-	"encoding/json"
 	"github.com/Max425/film-library.git/internal/common"
 	"github.com/Max425/film-library.git/internal/domain"
 	"github.com/Max425/film-library.git/internal/http-server/handler/dto"
 	"go.uber.org/zap"
+	"io"
 	"net/http"
 	"strconv"
 )
@@ -48,23 +48,27 @@ func (h *ActorHandler) CreateActor(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var actor dto.Actor
-	if err := json.NewDecoder(r.Body).Decode(&actor); err != nil {
+	body, _ := io.ReadAll(r.Body)
+	if err := actor.UnmarshalJSON(body); err != nil {
+		h.log.Error("Failed to decode actor", zap.Error(err))
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, common.ErrBadRequest.String())
 		return
 	}
 	domainActor, err := dto.ActorDtoToDomain(&actor)
 	if err != nil {
+		h.log.Error("Failed to convert actor", zap.Error(err))
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	actorCreated, err := h.actorService.CreateActor(r.Context(), domainActor)
 	if err != nil {
+		h.log.Error("Failed to create actor", zap.Error(err))
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, common.ErrInternal.String())
 		return
 	}
 
-	dto.NewSuccessClientResponseDto(r.Context(), w, http.StatusCreated, actorCreated)
+	dto.NewSuccessClientResponseDto(r.Context(), w, actorCreated)
 }
 
 // UpdateActor updates an existing actor.
@@ -85,23 +89,27 @@ func (h *ActorHandler) UpdateActor(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var actor dto.Actor
-	if err := json.NewDecoder(r.Body).Decode(&actor); err != nil {
+	body, _ := io.ReadAll(r.Body)
+	if err := actor.UnmarshalJSON(body); err != nil {
+		h.log.Error("Failed to decode actor", zap.Error(err))
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, common.ErrBadRequest.String())
 		return
 	}
 	domainActor, err := dto.ActorDtoToDomain(&actor)
 	if err != nil {
+		h.log.Error("Failed to convert actor", zap.Error(err))
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	actorUpdated, err := h.actorService.UpdateActor(r.Context(), domainActor)
 	if err != nil {
+		h.log.Error("Failed to update actor", zap.Error(err))
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, common.ErrInternal.String())
 		return
 	}
 
-	dto.NewSuccessClientResponseDto(r.Context(), w, http.StatusOK, actorUpdated)
+	dto.NewSuccessClientResponseDto(r.Context(), w, actorUpdated)
 }
 
 // DeleteActor deletes an existing actor.
@@ -127,11 +135,12 @@ func (h *ActorHandler) DeleteActor(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = h.actorService.DeleteActor(r.Context(), actorID); err != nil {
+		h.log.Error("Failed to delete actor", zap.Error(err))
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	dto.NewSuccessClientResponseDto(r.Context(), w, http.StatusOK, "Actor deleted successfully")
+	dto.NewSuccessClientResponseDto(r.Context(), w, "Actor deleted successfully")
 }
 
 // GetAllActors retrieves all actors.
@@ -150,9 +159,10 @@ func (h *ActorHandler) GetAllActors(w http.ResponseWriter, r *http.Request) {
 
 	actors, err := h.actorService.GetAllActors(r.Context())
 	if err != nil {
+		h.log.Error("Failed to get all actors", zap.Error(err))
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	dto.NewSuccessClientResponseDto(r.Context(), w, http.StatusOK, actors)
+	dto.NewSuccessClientResponseDto(r.Context(), w, actors)
 }

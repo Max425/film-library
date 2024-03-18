@@ -2,13 +2,13 @@ package handler
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"github.com/Max425/film-library.git/internal/common"
 	"github.com/Max425/film-library.git/internal/common/constants"
 	"github.com/Max425/film-library.git/internal/domain"
 	"github.com/Max425/film-library.git/internal/http-server/handler/dto"
 	"go.uber.org/zap"
+	"io"
 	"net/http"
 	"time"
 )
@@ -50,13 +50,16 @@ func (h *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var input dto.SignInInput
-	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+	body, _ := io.ReadAll(r.Body)
+	if err := input.UnmarshalJSON(body); err != nil {
+		h.log.Error("Failed to decode user", zap.Error(err))
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, common.ErrBadRequest.String())
 		return
 	}
 
 	user, err := h.authService.GetUser(r.Context(), input.Mail, input.Password)
 	if err != nil {
+		h.log.Error("Failed to get user", zap.Error(err))
 		if errors.Is(err, domain.ErrNotFound) {
 			dto.NewErrorClientResponseDto(r.Context(), w, http.StatusUnauthorized, common.InvalidMailOrPassword.String())
 		} else if errors.Is(err, domain.ErrRequired) {
@@ -68,12 +71,13 @@ func (h *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 	SID, err := h.authService.GenerateCookie(r.Context(), user.Role())
 	if err != nil {
+		h.log.Error("Failed to generate cookie", zap.Error(err))
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, common.ErrInternal.String())
 		return
 	}
 
 	http.SetCookie(w, createCookie("session_id", SID))
-	dto.NewSuccessClientResponseDto(r.Context(), w, http.StatusOK, "")
+	dto.NewSuccessClientResponseDto(r.Context(), w, "login :)")
 }
 
 // Logout
@@ -98,6 +102,7 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = h.authService.DeleteCookie(r.Context(), session.Value); err != nil {
+		h.log.Error("Failed to delete cookie", zap.Error(err))
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, common.ErrInternal.String())
 		return
 	}
@@ -106,7 +111,7 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	session.Path = "/"
 
 	http.SetCookie(w, session)
-	dto.NewSuccessClientResponseDto(r.Context(), w, http.StatusOK, "")
+	dto.NewSuccessClientResponseDto(r.Context(), w, "Logout :)")
 }
 
 // SignUp
@@ -126,30 +131,35 @@ func (h *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var input dto.SignUpInput
-	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+	body, _ := io.ReadAll(r.Body)
+	if err := input.UnmarshalJSON(body); err != nil {
+		h.log.Error("Failed to decode user", zap.Error(err))
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, common.ErrBadRequest.String())
 		return
 	}
 
 	domainUser, err := dto.SignUpInputToDomainUser(&input)
 	if err != nil {
+		h.log.Error("Failed to convert user", zap.Error(err))
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, common.ErrBadRequest.String())
 		return
 	}
 	userId, err := h.authService.CreateUser(r.Context(), domainUser)
 	if err != nil {
+		h.log.Error("Failed to create user", zap.Error(err))
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, common.ErrInternal.String())
 		return
 	}
 
-	cookie, err := h.authService.GenerateCookie(r.Context(), 0)
+	cookie, err := h.authService.GenerateCookie(r.Context(), constants.UserRole)
 	if err != nil {
+		h.log.Error("Failed to generate cookie", zap.Error(err))
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, common.ErrInternal.String())
 		return
 	}
 
 	http.SetCookie(w, createCookie("session_id", cookie))
-	dto.NewSuccessClientResponseDto(r.Context(), w, http.StatusOK, map[string]int{"id": userId})
+	dto.NewSuccessClientResponseDto(r.Context(), w, map[string]int{"id": userId})
 }
 
 func createCookie(name, SID string) *http.Cookie {

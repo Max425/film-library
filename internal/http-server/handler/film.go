@@ -2,11 +2,11 @@ package handler
 
 import (
 	"context"
-	"encoding/json"
 	"github.com/Max425/film-library.git/internal/common"
 	"github.com/Max425/film-library.git/internal/domain"
 	"github.com/Max425/film-library.git/internal/http-server/handler/dto"
 	"go.uber.org/zap"
+	"io"
 	"net/http"
 	"strconv"
 )
@@ -48,24 +48,27 @@ func (h *FilmHandler) CreateFilm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var film dto.Film
-	err := json.NewDecoder(r.Body).Decode(&film)
-	if err != nil {
+	body, _ := io.ReadAll(r.Body)
+	if err := film.UnmarshalJSON(body); err != nil {
+		h.log.Error("Failed to decode film", zap.Error(err))
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, common.ErrBadRequest.String())
 		return
 	}
 	domainFilm, err := dto.FilmDtoToDomain(&film)
 	if err != nil {
+		h.log.Error("Failed to convert film", zap.Error(err))
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	createdFilm, err := h.filmService.CreateFilm(r.Context(), domainFilm)
 	if err != nil {
+		h.log.Error("Failed to create film", zap.Error(err))
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, common.ErrInternal.String())
 		return
 	}
 
-	dto.NewSuccessClientResponseDto(r.Context(), w, http.StatusCreated, createdFilm)
+	dto.NewSuccessClientResponseDto(r.Context(), w, createdFilm)
 }
 
 // UpdateFilm updates an existing film.
@@ -86,25 +89,28 @@ func (h *FilmHandler) UpdateFilm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var film dto.Film
-	err := json.NewDecoder(r.Body).Decode(&film)
-	if err != nil {
+	body, _ := io.ReadAll(r.Body)
+	if err := film.UnmarshalJSON(body); err != nil {
+		h.log.Error("Failed to decode film", zap.Error(err))
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, common.ErrBadRequest.String())
 		return
 	}
 
 	domainFilm, err := dto.FilmDtoToDomain(&film)
 	if err != nil {
+		h.log.Error("Failed to convert film", zap.Error(err))
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	updatedFilm, err := h.filmService.UpdateFilm(r.Context(), domainFilm)
 	if err != nil {
+		h.log.Error("Failed to update film", zap.Error(err))
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, common.ErrInternal.String())
 		return
 	}
 
-	dto.NewSuccessClientResponseDto(r.Context(), w, http.StatusOK, updatedFilm)
+	dto.NewSuccessClientResponseDto(r.Context(), w, updatedFilm)
 }
 
 // DeleteFilm deletes an existing film.
@@ -131,11 +137,12 @@ func (h *FilmHandler) DeleteFilm(w http.ResponseWriter, r *http.Request) {
 
 	err = h.filmService.DeleteFilm(r.Context(), id)
 	if err != nil {
+		h.log.Error("Failed to delete film", zap.Error(err))
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, common.ErrInternal.String())
 		return
 	}
 
-	dto.NewSuccessClientResponseDto(r.Context(), w, http.StatusOK, "Film deleted successfully")
+	dto.NewSuccessClientResponseDto(r.Context(), w, "Film deleted successfully")
 }
 
 // GetAllFilms retrieves all films.
@@ -154,9 +161,10 @@ func (h *FilmHandler) GetAllFilms(w http.ResponseWriter, r *http.Request) {
 
 	films, err := h.filmService.GetAllFilms(r.Context())
 	if err != nil {
+		h.log.Error("Failed to get all films", zap.Error(err))
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, common.ErrInternal.String())
 		return
 	}
 
-	dto.NewSuccessClientResponseDto(r.Context(), w, http.StatusOK, films)
+	dto.NewSuccessClientResponseDto(r.Context(), w, films)
 }

@@ -27,6 +27,10 @@ func NewActor(id int, name, gender string, birthDate time.Time, films []*Film) (
 		return nil, fmt.Errorf("invalid gender, must be male/female/other")
 	}
 
+	if birthDate.After(time.Now()) {
+		return nil, fmt.Errorf("birth date cannot be in the future")
+	}
+
 	return &Actor{
 		id:        id,
 		name:      name,
