@@ -64,3 +64,8 @@ func (a *Actor) GetBirthDate() time.Time {
 func (a *Actor) GetFilms() []*Film {
 	return a.films
 }
+
+// AddFilm возвращает фильмы, в которых участвовал актер.
+func (a *Actor) AddFilm(film *Film) {
+	a.films = append(a.films, film)
+}

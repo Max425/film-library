@@ -4,11 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 	"github.com/Max425/film-library.git/internal/domain"
 	"github.com/Max425/film-library.git/internal/repository/store"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
+	"time"
 )
 
 type ActorRepository struct {
@@ -70,21 +70,49 @@ func (r *ActorRepository) DeleteActor(ctx context.Context, id int) error {
 }
 
 func (r *ActorRepository) GetAllActors(ctx context.Context) ([]*domain.Actor, error) {
-	var storeActors []*store.Actor
-	query := `SELECT * FROM actor`
-	err := r.db.SelectContext(ctx, &storeActors, query)
+	query := `
+		SELECT a.id, a.name, a.gender, a.birth_date, f.id AS film_id, f.title, f.description, f.release_date, f.rating
+		FROM actor AS a
+		LEFT JOIN film_actor AS fa ON a.id = fa.actor_id
+		LEFT JOIN film AS f ON fa.film_id = f.id
+		ORDER BY a.id, f.id
+	`
+	rows, err := r.db.QueryContext(ctx, query)
 	if err != nil {
-		r.logger.Error("Failed to get all actors", zap.Error(err))
+		r.logger.Error("Failed to get all actors with films", zap.Error(err))
 		return nil, err
 	}
-	actors := make([]*domain.Actor, len(storeActors))
-	for i, storeActor := range storeActors {
-		actor, err := store.ActorStoreToDomain(storeActor)
-		if err != nil {
-			r.logger.Error(fmt.Sprintf("Failed to convert store actor to domain actor: %v", err))
+	defer rows.Close()
+
+	var actors []*domain.Actor
+	var currentActor *domain.Actor
+	for rows.Next() {
+		var actorID int
+		var actorName, actorGender string
+		var actorBirthDate time.Time
+		var filmID sql.NullInt64
+		var filmTitle, filmDescription sql.NullString
+		var filmReleaseDate sql.NullTime
+		var filmRating sql.NullFloat64
+		if err = rows.Scan(&actorID, &actorName, &actorGender, &actorBirthDate, &filmID, &filmTitle, &filmDescription, &filmReleaseDate, &filmRating); err != nil {
+			r.logger.Error("Failed to scan row", zap.Error(err))
 			continue
 		}
-		actors[i] = actor
+
+		if currentActor == nil || currentActor.GetId() != actorID {
+			currentActor, _ = domain.NewActor(actorID, actorName, actorGender, actorBirthDate, make([]*domain.Film, 0))
+			actors = append(actors, currentActor)
+		}
+
+		if filmID.Valid {
+			film, _ := domain.NewFilm(int(filmID.Int64), filmTitle.String, filmDescription.String, filmReleaseDate.Time, filmRating.Float64, nil)
+			currentActor.AddFilm(film)
+		}
 	}
+	if err = rows.Err(); err != nil {
+		r.logger.Error("Error while iterating rows", zap.Error(err))
+		return nil, err
+	}
+
 	return actors, nil
 }

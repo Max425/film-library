@@ -75,3 +75,8 @@ func (f *Film) GetRating() float64 {
 func (f *Film) GetActors() []*Actor {
 	return f.actors
 }
+
+// AddActor returns the actors associated with the film.
+func (f *Film) AddActor(actor *Actor) {
+	f.actors = append(f.actors, actor)
+}
