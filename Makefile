@@ -19,9 +19,9 @@ mod:
 	go mod tidy -compat=1.21 && go mod vendor && go install ./...
 
 tests:
-	go test -coverpkg=./... -coverprofile=cover.out.tmp ./...
-	cat cover.out.tmp | grep -v "mocks\|cmd\|configs\|docs\|constants\|utils\|migrations\|common" > cover.out
-	go tool cover -func=cover.out
+	go test ./internal/... -cover -coverprofile=cover.out -coverpkg=./internal/...
+	cat cover.out | fgrep -v "http" | fgrep -v "config" | fgrep -v "mocks" > cover1.out
+	go tool cover -func=cover1.out
 
 mock:
 	mockgen -source=internal/http-server/handler/actor.go -destination=mocks/service/mock_actor.go
