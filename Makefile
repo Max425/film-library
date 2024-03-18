@@ -20,7 +20,7 @@ mod:
 
 tests:
 	go test ./internal/... -cover -coverprofile=cover.out -coverpkg=./internal/...
-	cat cover.out | fgrep -v "http" | fgrep -v "config" | fgrep -v "mocks" > cover1.out
+	cat cover.out | fgrep -v "dto" | fgrep -v "config" | fgrep -v "mocks" > cover1.out
 	go tool cover -func=cover1.out
 
 mock:
