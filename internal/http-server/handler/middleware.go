@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"errors"
 	"github.com/Max425/film-library.git/internal/constants"
 	"github.com/Max425/film-library.git/internal/http-server/handler/dto"
 	"go.uber.org/zap"
@@ -10,7 +11,40 @@ import (
 	"time"
 )
 
-func (h *Handler) loggingMiddleware(next http.Handler) http.HandlerFunc {
+type Middleware struct {
+	log         *zap.Logger
+	authService AuthService
+}
+
+func NewMiddleware(log *zap.Logger, authService AuthService) *Middleware {
+	return &Middleware{
+		log:         log,
+		authService: authService,
+	}
+}
+
+func (h *Middleware) authMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		session, err := r.Cookie("session_id")
+		if errors.Is(err, http.ErrNoCookie) {
+			dto.NewErrorClientResponseDto(r.Context(), w, http.StatusUnauthorized, "Need auth")
+			return
+		}
+
+		role, err := h.authService.GetSessionValue(r.Context(), session.Value)
+		if err != nil {
+			dto.NewErrorClientResponseDto(r.Context(), w, http.StatusUnauthorized, "Need auth")
+			return
+		}
+		if (r.Method == "POST" || r.Method == "PUT") && role != constants.AdminRole {
+			dto.NewErrorClientResponseDto(r.Context(), w, http.StatusForbidden, "forbidden")
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (h *Middleware) loggingMiddleware(next http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 
@@ -35,7 +69,7 @@ func (h *Handler) loggingMiddleware(next http.Handler) http.HandlerFunc {
 	}
 }
 
-func (h *Handler) panicRecoveryMiddleware(next http.Handler) http.HandlerFunc {
+func (h *Middleware) panicRecoveryMiddleware(next http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if err := recover(); err != nil {

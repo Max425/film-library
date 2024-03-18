@@ -24,11 +24,34 @@ definitions:
       title:
         type: string
     type: object
+  dto.SignInInput:
+    properties:
+      mail:
+        type: string
+      password:
+        type: string
+    required:
+    - mail
+    - password
+    type: object
+  dto.SignUpInput:
+    properties:
+      mail:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    required:
+    - mail
+    - name
+    - password
+    type: object
 host: localhost:8000
 info:
   contact: {}
   description: API Server for Film Library
-  title: WB API
+  title: Filmoteka API
   version: "1.0"
 paths:
   /api/actors:
@@ -81,6 +104,91 @@ paths:
       summary: Delete an existing actor
       tags:
       - actors
+  /api/auth/login:
+    post:
+      consumes:
+      - application/json
+      operationId: login
+      parameters:
+      - description: Sign-in input parameters
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SignInInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+      summary: log in to account
+      tags:
+      - auth
+  /api/auth/logout:
+    delete:
+      consumes:
+      - application/json
+      operationId: logout
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+      summary: log out of account
+      tags:
+      - auth
+  /api/auth/sign-up:
+    post:
+      consumes:
+      - application/json
+      operationId: create-account
+      parameters:
+      - description: Sign-up input user
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SignUpInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: integer
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+      summary: sign up account
+      tags:
+      - auth
   /api/create_actors:
     post:
       consumes:

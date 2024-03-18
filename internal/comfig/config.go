@@ -6,12 +6,20 @@ import (
 	"github.com/spf13/viper"
 	"log"
 	"os"
+	"strconv"
 )
 
 type Config struct {
 	Postgres PostgresConfig
+	Redis    RedisConfig
 	Env      string
 	HttpAddr string
+}
+
+type RedisConfig struct {
+	Addr     string
+	Password string
+	DB       int
 }
 
 type PostgresConfig struct {
@@ -38,6 +46,7 @@ func MustLoad() *Config {
 }
 
 func newConfig() *Config {
+	redisDb, _ := strconv.Atoi(viper.GetString("redis.db"))
 	return &Config{
 		Postgres: PostgresConfig{
 			Host:     viper.GetString("db.host"),
@@ -46,6 +55,11 @@ func newConfig() *Config {
 			DBName:   viper.GetString("db.dbname"),
 			SSLMode:  viper.GetString("db.sslmode"),
 			Password: viper.GetString("db.password"),
+		},
+		Redis: RedisConfig{
+			Addr:     viper.GetString("redis.addr"),
+			Password: "",
+			DB:       redisDb,
 		},
 		Env:      viper.GetString("env"),
 		HttpAddr: fmt.Sprintf("%s:%s", viper.GetString("server.host"), viper.GetString("server.port")),

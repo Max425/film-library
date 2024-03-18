@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-// @title WB API
+// @title Filmoteka API
 // @version 1.0
 // @description API Server for Film Library
 
@@ -39,7 +39,7 @@ func run() error {
 	}
 
 	// create http server with all handlers & services & repositories
-	srv, err := http_server.NewHttpServer(logger, cfg.Postgres, cfg.HttpAddr)
+	srv, err := http_server.NewHttpServer(logger, cfg.Postgres, cfg.Redis, cfg.HttpAddr)
 	if err != nil {
 		logger.Error("create http server", zap.Error(err))
 		return err

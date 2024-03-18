@@ -17,15 +17,21 @@ type Service interface {
 	handler.FilmService
 }
 
-func NewHttpServer(log *zap.Logger, postgres config.PostgresConfig, listenAddr string) (*http.Server, error) {
+func NewHttpServer(log *zap.Logger, postgres config.PostgresConfig, redis config.RedisConfig, listenAddr string) (*http.Server, error) {
 	// connect to db
 	dbConnect, err := repository.NewPostgresDB(postgres)
 	if err != nil {
 		return nil, err
 	}
 
+	// connect to redis
+	redisClient, err := repository.NewRedisClient(redis)
+	if err != nil {
+		return nil, err
+	}
+
 	// create all repositories
-	repositories := repository.NewRepository(dbConnect, log)
+	repositories := repository.NewRepository(dbConnect, log, redisClient)
 
 	// create all services
 	services := service.NewService(repositories, log)
@@ -37,18 +43,22 @@ func NewHttpServer(log *zap.Logger, postgres config.PostgresConfig, listenAddr s
 	mux.Handle("/swagger/", httpSwagger.Handler(
 		httpSwagger.URL(fmt.Sprintf("%s/swagger/doc.json", constants.Host)),
 	))
+	// Auth
+	mux.HandleFunc("/api/auth/login", h.UseRecoveryLogging(h.SignIn))
+	mux.HandleFunc("/api/auth/logout", h.UseRecoveryLoggingAuth(h.Logout))
+	mux.HandleFunc("/api/auth/sign-up", h.UseRecoveryLoggingAuth(h.SignUp))
 
 	// Actors endpoints
-	mux.HandleFunc("/api/create_actors", h.Use(h.CreateActor))
-	mux.HandleFunc("/api/update_actors", h.Use(h.UpdateActor))
-	mux.HandleFunc("/api/actors/{id}", h.Use(h.DeleteActor))
-	mux.HandleFunc("/api/actors", h.Use(h.GetAllActors))
+	mux.HandleFunc("/api/create_actors", h.UseRecoveryLoggingAuth(h.CreateActor))
+	mux.HandleFunc("/api/update_actors", h.UseRecoveryLoggingAuth(h.UpdateActor))
+	mux.HandleFunc("/api/actors/{id}", h.UseRecoveryLoggingAuth(h.DeleteActor))
+	mux.HandleFunc("/api/actors", h.UseRecoveryLoggingAuth(h.GetAllActors))
 
 	// Films endpoints
-	mux.HandleFunc("/api/create_films", h.Use(h.CreateFilm))
-	mux.HandleFunc("/api/update_films", h.Use(h.UpdateFilm))
-	mux.HandleFunc("/api/films/{id}", h.Use(h.DeleteFilm))
-	mux.HandleFunc("/api/films", h.Use(h.GetAllFilms))
+	mux.HandleFunc("/api/create_films", h.UseRecoveryLoggingAuth(h.CreateFilm))
+	mux.HandleFunc("/api/update_films", h.UseRecoveryLoggingAuth(h.UpdateFilm))
+	mux.HandleFunc("/api/films/{id}", h.UseRecoveryLoggingAuth(h.DeleteFilm))
+	mux.HandleFunc("/api/films", h.UseRecoveryLoggingAuth(h.GetAllFilms))
 
 	return &http.Server{
 		Addr:    listenAddr,

@@ -9,3 +9,7 @@ db:
   dbname: "filmoteka"
   sslmode: "disable"
   password: "postgres"
+
+redis:
+  addr: "localhost:6379"
+  db: "0"
