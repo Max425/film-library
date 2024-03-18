@@ -54,7 +54,7 @@ func (s *AuthService) GetUser(ctx context.Context, mail, password string) (*doma
 func (s *AuthService) GenerateCookie(ctx context.Context, role int) (string, error) {
 	SID := GenerateUuid()
 	if err := s.storeRepo.SetSession(ctx, SID, role, constants.CookieExpire); err != nil {
-		return SID, err
+		return "", err
 	}
 
 	return SID, nil
