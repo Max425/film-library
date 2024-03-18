@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 	"log"
 	"os"
@@ -32,13 +31,13 @@ type PostgresConfig struct {
 }
 
 func MustLoad() *Config {
-	err := godotenv.Load("configs/.env")
-	if err != nil {
-		log.Fatalf("Ошибка при загрузке файла .env: %s", err)
-	}
+	//err := godotenv.Load("configs/.env")
+	//if err != nil {
+	//	log.Fatalf("Ошибка при загрузке файла .env: %s", err)
+	//}
 	viper.AddConfigPath(os.Getenv("CONFIG_PATH"))
 	viper.SetConfigName(os.Getenv("CONFIG_NAME"))
-	err = viper.ReadInConfig()
+	err := viper.ReadInConfig()
 	if err != nil {
 		log.Fatalf("Ошибка при загрузке конфига: %s", err)
 	}
