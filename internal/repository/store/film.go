@@ -13,6 +13,8 @@ type Film struct {
 	ReleaseDate time.Time `db:"release_date"`
 	Rating      float64   `db:"rating"`
 	Actors      []*Actor  `db:"actors"`
+	CreatedAt   time.Time `db:"created_at"`
+	UpdatedAt   time.Time `db:"updated_at"`
 }
 
 func FilmStoreToDomain(storeFilm *Film) (*domain.Film, error) {

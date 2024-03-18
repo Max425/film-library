@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"github.com/Max425/film-library.git/internal/common"
 	"github.com/Max425/film-library.git/internal/domain"
 	"github.com/Max425/film-library.git/internal/http-server/handler/dto"
 	"go.uber.org/zap"
@@ -49,7 +50,7 @@ func (h *FilmHandler) CreateFilm(w http.ResponseWriter, r *http.Request) {
 	var film dto.Film
 	err := json.NewDecoder(r.Body).Decode(&film)
 	if err != nil {
-		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, err.Error())
+		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, common.ErrBadRequest.String())
 		return
 	}
 	domainFilm, err := dto.FilmDtoToDomain(&film)
@@ -60,7 +61,7 @@ func (h *FilmHandler) CreateFilm(w http.ResponseWriter, r *http.Request) {
 
 	createdFilm, err := h.filmService.CreateFilm(r.Context(), domainFilm)
 	if err != nil {
-		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
+		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, common.ErrInternal.String())
 		return
 	}
 
@@ -87,7 +88,7 @@ func (h *FilmHandler) UpdateFilm(w http.ResponseWriter, r *http.Request) {
 	var film dto.Film
 	err := json.NewDecoder(r.Body).Decode(&film)
 	if err != nil {
-		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, err.Error())
+		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, common.ErrBadRequest.String())
 		return
 	}
 
@@ -99,7 +100,7 @@ func (h *FilmHandler) UpdateFilm(w http.ResponseWriter, r *http.Request) {
 
 	updatedFilm, err := h.filmService.UpdateFilm(r.Context(), domainFilm)
 	if err != nil {
-		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
+		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, common.ErrInternal.String())
 		return
 	}
 
@@ -130,7 +131,7 @@ func (h *FilmHandler) DeleteFilm(w http.ResponseWriter, r *http.Request) {
 
 	err = h.filmService.DeleteFilm(r.Context(), id)
 	if err != nil {
-		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
+		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, common.ErrInternal.String())
 		return
 	}
 
@@ -153,7 +154,7 @@ func (h *FilmHandler) GetAllFilms(w http.ResponseWriter, r *http.Request) {
 
 	films, err := h.filmService.GetAllFilms(r.Context())
 	if err != nil {
-		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
+		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, common.ErrInternal.String())
 		return
 	}
 

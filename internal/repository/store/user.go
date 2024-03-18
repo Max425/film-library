@@ -1,14 +1,19 @@
 package store
 
-import "github.com/Max425/film-library.git/internal/domain"
+import (
+	"github.com/Max425/film-library.git/internal/domain"
+	"time"
+)
 
 type User struct {
-	ID           int    `db:"id"`
-	Name         string `db:"name"`
-	Mail         string `db:"mail"`
-	PasswordHash string `db:"password_hash"`
-	Salt         string `db:"salt"`
-	Role         int    `db:"role"`
+	ID           int       `db:"id"`
+	Name         string    `db:"name"`
+	Mail         string    `db:"mail"`
+	PasswordHash string    `db:"password_hash"`
+	Salt         string    `db:"salt"`
+	Role         int       `db:"role"`
+	CreatedAt    time.Time `db:"created_at"`
+	UpdatedAt    time.Time `db:"updated_at"`
 }
 
 func UserDomainToStore(domainUser *domain.User) *User {

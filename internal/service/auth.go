@@ -4,7 +4,7 @@ import (
 	"context"
 	"crypto/sha1"
 	"fmt"
-	"github.com/Max425/film-library.git/internal/constants"
+	"github.com/Max425/film-library.git/internal/common/constants"
 	"github.com/Max425/film-library.git/internal/domain"
 	"github.com/google/uuid"
 	"go.uber.org/zap"

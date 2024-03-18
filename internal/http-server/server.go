@@ -4,7 +4,7 @@ import (
 	"fmt"
 	_ "github.com/Max425/film-library.git/docs"
 	"github.com/Max425/film-library.git/internal/comfig"
-	"github.com/Max425/film-library.git/internal/constants"
+	"github.com/Max425/film-library.git/internal/common/constants"
 	"github.com/Max425/film-library.git/internal/http-server/handler"
 	"github.com/Max425/film-library.git/internal/repository"
 	"github.com/Max425/film-library.git/internal/service"
@@ -45,8 +45,8 @@ func NewHttpServer(log *zap.Logger, postgres config.PostgresConfig, redis config
 	))
 	// Auth
 	mux.HandleFunc("/api/auth/login", h.UseRecoveryLogging(h.SignIn))
-	mux.HandleFunc("/api/auth/logout", h.UseRecoveryLoggingAuth(h.Logout))
-	mux.HandleFunc("/api/auth/sign-up", h.UseRecoveryLoggingAuth(h.SignUp))
+	mux.HandleFunc("/api/auth/logout", h.UseRecoveryLogging(h.Logout))
+	mux.HandleFunc("/api/auth/sign-up", h.UseRecoveryLogging(h.SignUp))
 
 	// Actors endpoints
 	mux.HandleFunc("/api/create_actors", h.UseRecoveryLoggingAuth(h.CreateActor))

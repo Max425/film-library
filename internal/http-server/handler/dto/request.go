@@ -2,7 +2,7 @@ package dto
 
 import (
 	"context"
-	"github.com/Max425/film-library.git/internal/constants"
+	"github.com/Max425/film-library.git/internal/common/constants"
 	"net/http"
 )
 

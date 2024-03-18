@@ -12,6 +12,8 @@ type Actor struct {
 	Gender    string    `db:"gender"`
 	BirthDate time.Time `db:"birth_date"`
 	Films     []*Film   `db:"films"`
+	CreatedAt time.Time `db:"created_at"`
+	UpdatedAt time.Time `db:"updated_at"`
 }
 
 func ActorStoreToDomain(storeActor *Actor) (*domain.Actor, error) {

@@ -3,7 +3,7 @@ package handler
 import (
 	"context"
 	"errors"
-	"github.com/Max425/film-library.git/internal/constants"
+	"github.com/Max425/film-library.git/internal/common/constants"
 	"github.com/Max425/film-library.git/internal/http-server/handler/dto"
 	"go.uber.org/zap"
 	"net/http"

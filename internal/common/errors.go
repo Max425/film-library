@@ -5,9 +5,10 @@ type ErrorType struct {
 }
 
 var (
-	ErrNotFound   = ErrorType{"not found"}
-	ErrInternal   = ErrorType{"internal error"}
-	ErrBadRequest = ErrorType{"bad request"}
+	ErrNotFound           = ErrorType{"not found"}
+	ErrInternal           = ErrorType{"internal error"}
+	InvalidMailOrPassword = ErrorType{"invalid mail or password"}
+	ErrBadRequest         = ErrorType{"bad request"}
 )
 
 func (er *ErrorType) String() string {

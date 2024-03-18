@@ -27,9 +27,9 @@ mock:
 	echo 'Hello'
 #	mockgen -source=pkg/repository/repository.go -destination=pkg/repository/mocks/mock.go \
 #	&& mockgen -source=pkg/service/service.go -destination=pkg/service/mocks/mock.go
+
 swag:
 	swag init -g cmd/app/main.go
 
 lint:
-	go get github.com/golangci/golangci-lint/cmd/golangci-lint
 	golangci-lint run

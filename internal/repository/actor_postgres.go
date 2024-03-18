@@ -25,7 +25,7 @@ func NewActorRepository(db *sqlx.DB, logger *zap.Logger) *ActorRepository {
 
 func (r *ActorRepository) CreateActor(ctx context.Context, actor *domain.Actor) (*domain.Actor, error) {
 	storeActor := store.ActorDomainToStore(actor)
-	query := `INSERT INTO actors (name, gender, birth_date) VALUES ($1, $2, $3) RETURNING id`
+	query := `INSERT INTO actor (name, gender, birth_date) VALUES ($1, $2, $3) RETURNING id`
 	err := r.db.QueryRowContext(ctx, query, storeActor.Name, storeActor.Gender, storeActor.BirthDate).Scan(&storeActor.ID)
 	if err != nil {
 		r.logger.Error("Failed to create actor", zap.Error(err))
@@ -36,7 +36,7 @@ func (r *ActorRepository) CreateActor(ctx context.Context, actor *domain.Actor) 
 
 func (r *ActorRepository) FindActorByID(ctx context.Context, id int) (*domain.Actor, error) {
 	storeActor := &store.Actor{}
-	query := `SELECT * FROM actors WHERE id = $1`
+	query := `SELECT * FROM actor WHERE id = $1`
 	err := r.db.GetContext(ctx, storeActor, query, id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -50,7 +50,7 @@ func (r *ActorRepository) FindActorByID(ctx context.Context, id int) (*domain.Ac
 
 func (r *ActorRepository) UpdateActor(ctx context.Context, actor *domain.Actor) (*domain.Actor, error) {
 	storeActor := store.ActorDomainToStore(actor)
-	query := `UPDATE actors SET name = $1, gender = $2, birth_date = $3 WHERE id = $4`
+	query := `UPDATE actor SET name = $1, gender = $2, birth_date = $3 WHERE id = $4`
 	_, err := r.db.ExecContext(ctx, query, storeActor.Name, storeActor.Gender, storeActor.BirthDate, storeActor.ID)
 	if err != nil {
 		r.logger.Error("Failed to update actor", zap.Error(err))
@@ -60,7 +60,7 @@ func (r *ActorRepository) UpdateActor(ctx context.Context, actor *domain.Actor) 
 }
 
 func (r *ActorRepository) DeleteActor(ctx context.Context, id int) error {
-	query := `DELETE FROM actors WHERE id = $1`
+	query := `DELETE FROM actor WHERE id = $1`
 	_, err := r.db.ExecContext(ctx, query, id)
 	if err != nil {
 		r.logger.Error("Failed to delete actor", zap.Error(err))
@@ -71,7 +71,7 @@ func (r *ActorRepository) DeleteActor(ctx context.Context, id int) error {
 
 func (r *ActorRepository) GetAllActors(ctx context.Context) ([]*domain.Actor, error) {
 	var storeActors []*store.Actor
-	query := `SELECT * FROM actors`
+	query := `SELECT * FROM actor`
 	err := r.db.SelectContext(ctx, &storeActors, query)
 	if err != nil {
 		r.logger.Error("Failed to get all actors", zap.Error(err))

@@ -38,7 +38,5 @@ func (h *Handler) UseRecoveryLoggingAuth(next http.HandlerFunc) http.HandlerFunc
 
 func (h *Handler) UseRecoveryLogging(next http.HandlerFunc) http.HandlerFunc {
 	return h.panicRecoveryMiddleware(
-		h.loggingMiddleware(
-			h.authMiddleware(next)),
-	)
+		h.loggingMiddleware(next))
 }

@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/Max425/film-library.git/internal/common"
-	"github.com/Max425/film-library.git/internal/constants"
+	"github.com/Max425/film-library.git/internal/common/constants"
 	"github.com/Max425/film-library.git/internal/domain"
 	"github.com/Max425/film-library.git/internal/http-server/handler/dto"
 	"go.uber.org/zap"
@@ -51,24 +51,24 @@ func (h *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 
 	var input dto.SignInInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
+		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, common.ErrBadRequest.String())
 		return
 	}
 
 	user, err := h.authService.GetUser(r.Context(), input.Mail, input.Password)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			dto.NewErrorClientResponseDto(r.Context(), w, http.StatusNotFound, err.Error())
+			dto.NewErrorClientResponseDto(r.Context(), w, http.StatusUnauthorized, common.InvalidMailOrPassword.String())
 		} else if errors.Is(err, domain.ErrRequired) {
 			dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, err.Error())
 		} else {
-			dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, common.ErrInternal)
+			dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, common.ErrInternal.String())
 		}
 		return
 	}
 	SID, err := h.authService.GenerateCookie(r.Context(), user.Role())
 	if err != nil {
-		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, common.ErrInternal)
+		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, common.ErrInternal.String())
 		return
 	}
 
@@ -98,7 +98,7 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = h.authService.DeleteCookie(r.Context(), session.Value); err != nil {
-		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, common.ErrInternal)
+		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, common.ErrInternal.String())
 		return
 	}
 
@@ -125,26 +125,26 @@ func (h *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var input *dto.SignUpInput
-	if err := json.NewDecoder(r.Body).Decode(input); err != nil {
-		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
+	var input dto.SignUpInput
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, common.ErrBadRequest.String())
 		return
 	}
 
-	domainUser, err := dto.SignUpInputToDomainUser(input)
+	domainUser, err := dto.SignUpInputToDomainUser(&input)
 	if err != nil {
-		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, err.Error())
+		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, common.ErrBadRequest.String())
 		return
 	}
 	userId, err := h.authService.CreateUser(r.Context(), domainUser)
 	if err != nil {
-		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
+		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, common.ErrInternal.String())
 		return
 	}
 
 	cookie, err := h.authService.GenerateCookie(r.Context(), 0)
 	if err != nil {
-		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
+		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, common.ErrInternal.String())
 		return
 	}
 
