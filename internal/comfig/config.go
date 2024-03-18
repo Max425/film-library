@@ -31,10 +31,6 @@ type PostgresConfig struct {
 }
 
 func MustLoad() *Config {
-	//err := godotenv.Load("configs/.env")
-	//if err != nil {
-	//	log.Fatalf("Ошибка при загрузке файла .env: %s", err)
-	//}
 	viper.AddConfigPath(os.Getenv("CONFIG_PATH"))
 	viper.SetConfigName(os.Getenv("CONFIG_NAME"))
 	err := viper.ReadInConfig()
