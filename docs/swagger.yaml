@@ -297,6 +297,34 @@ paths:
       summary: Delete an existing film
       tags:
       - films
+  /api/search_films/{pattern}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Film pattern
+        in: path
+        name: pattern
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of films
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/dto.Film'
+              type: array
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Search films by pattern
+      tags:
+      - films
   /api/update_actors:
     put:
       consumes:

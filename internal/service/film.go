@@ -13,6 +13,7 @@ type FilmRepository interface {
 	UpdateFilmActors(ctx context.Context, id int, actorsId []int) (*domain.Film, error)
 	DeleteFilm(ctx context.Context, id int) error
 	GetAllFilms(ctx context.Context) ([]*domain.Film, error)
+	SearchFilms(ctx context.Context, fragment string) ([]*domain.Film, error)
 }
 
 type FilmService struct {
@@ -61,4 +62,8 @@ func (s *FilmService) DeleteFilm(ctx context.Context, id int) error {
 
 func (s *FilmService) GetAllFilms(ctx context.Context) ([]*domain.Film, error) {
 	return s.filmRepo.GetAllFilms(ctx)
+}
+
+func (s *FilmService) SearchFilms(ctx context.Context, fragment string) ([]*domain.Film, error) {
+	return s.filmRepo.SearchFilms(ctx, fragment)
 }

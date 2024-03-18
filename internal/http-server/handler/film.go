@@ -19,6 +19,7 @@ type FilmService interface {
 	UpdateFilm(ctx context.Context, film *domain.Film) (*domain.Film, error)
 	UpdateFilmActors(ctx context.Context, id int, actorsId []int) (*domain.Film, error)
 	DeleteFilm(ctx context.Context, id int) error
+	SearchFilms(ctx context.Context, fragment string) ([]*domain.Film, error)
 	GetAllFilms(ctx context.Context) ([]*domain.Film, error)
 }
 
@@ -200,6 +201,35 @@ func (h *FilmHandler) DeleteFilm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	dto.NewSuccessClientResponseDto(r.Context(), w, "Film deleted successfully")
+}
+
+// SearchFilms
+// @Summary Search films by pattern
+// @Tags films
+// @Accept json
+// @Produce json
+// @Param pattern path string true "Film pattern"
+// @Success 200 {array} []dto.Film "List of films"
+// @Failure 500 {string} string "Internal server error"
+// @Router /api/search_films/{pattern} [get]
+func (h *FilmHandler) SearchFilms(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed))
+		return
+	}
+	pattern := r.URL.Path[len("/api/search_films/"):]
+	films, err := h.filmService.SearchFilms(r.Context(), pattern)
+	if err != nil {
+		h.log.Error("Failed to get all films", zap.Error(err))
+		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, common.ErrInternal.String())
+		return
+	}
+	data := make([]*dto.Film, len(films))
+	for i, film := range films {
+		data[i] = dto.FilmDomainToDto(film)
+	}
+
+	dto.NewSuccessClientResponseDto(r.Context(), w, data)
 }
 
 // GetAllFilms retrieves all films.

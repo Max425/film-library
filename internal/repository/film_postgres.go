@@ -95,7 +95,7 @@ func (r *FilmRepository) GetAllFilms(ctx context.Context) ([]*domain.Film, error
 		FROM film AS f
 		LEFT JOIN film_actor AS fa ON f.id = fa.film_id
 		LEFT JOIN actor AS a ON fa.actor_id = a.id
-		ORDER BY f.id, a.id
+		ORDER BY f.rating DESC
 	`
 	rows, err := r.db.QueryContext(ctx, query)
 	if err != nil {
@@ -129,6 +129,45 @@ func (r *FilmRepository) GetAllFilms(ctx context.Context) ([]*domain.Film, error
 			actor, _ := domain.NewActor(int(actorID.Int64), actorName.String, actorGender.String, actorBirthDate, nil)
 			currentFilm.AddActor(actor)
 		}
+	}
+	if err := rows.Err(); err != nil {
+		r.logger.Error("Error while iterating rows", zap.Error(err))
+		return nil, err
+	}
+
+	return films, nil
+}
+
+func (r *FilmRepository) SearchFilms(ctx context.Context, fragment string) ([]*domain.Film, error) {
+	query := `
+		SELECT DISTINCT f.id, f.title, f.description, f.release_date, f.rating
+		FROM film AS f
+		LEFT JOIN film_actor AS fa ON f.id = fa.film_id
+		LEFT JOIN actor AS a ON fa.actor_id = a.id
+		WHERE f.title ILIKE '%' || $1 || '%' OR a.name ILIKE '%' || $1 || '%'
+		ORDER BY f.rating DESC
+	`
+	rows, err := r.db.QueryContext(ctx, query, fragment)
+	if err != nil {
+		r.logger.Error("Failed to search films", zap.Error(err))
+		return nil, err
+	}
+	defer rows.Close()
+
+	var films []*domain.Film
+	for rows.Next() {
+		var filmID int
+		var filmTitle, filmDescription string
+		var filmReleaseDate time.Time
+		var filmRating float64
+
+		if err := rows.Scan(&filmID, &filmTitle, &filmDescription, &filmReleaseDate, &filmRating); err != nil {
+			r.logger.Error("Failed to scan row", zap.Error(err))
+			continue
+		}
+
+		film, _ := domain.NewFilm(filmID, filmTitle, filmDescription, filmReleaseDate, filmRating, nil)
+		films = append(films, film)
 	}
 	if err := rows.Err(); err != nil {
 		r.logger.Error("Error while iterating rows", zap.Error(err))
