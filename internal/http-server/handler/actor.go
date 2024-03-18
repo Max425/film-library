@@ -68,7 +68,7 @@ func (h *ActorHandler) CreateActor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dto.NewSuccessClientResponseDto(r.Context(), w, actorCreated)
+	dto.NewSuccessClientResponseDto(r.Context(), w, dto.ActorDomainToDto(actorCreated))
 }
 
 // UpdateActor updates an existing actor.
@@ -109,7 +109,7 @@ func (h *ActorHandler) UpdateActor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dto.NewSuccessClientResponseDto(r.Context(), w, actorUpdated)
+	dto.NewSuccessClientResponseDto(r.Context(), w, dto.ActorDomainToDto(actorUpdated))
 }
 
 // DeleteActor deletes an existing actor.
@@ -164,5 +164,10 @@ func (h *ActorHandler) GetAllActors(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dto.NewSuccessClientResponseDto(r.Context(), w, actors)
+	data := make([]*dto.Actor, len(actors))
+	for i, film := range actors {
+		data[i] = dto.ActorDomainToDto(film)
+	}
+
+	dto.NewSuccessClientResponseDto(r.Context(), w, data)
 }

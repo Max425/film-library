@@ -13,26 +13,27 @@ type RequestInfo struct {
 }
 
 type ClientResponseDto struct {
-	Status  int         `json:"status"`
-	Message string      `json:"message"`
-	Payload interface{} `json:"payload"`
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+	Payload any    `json:"payload"`
 }
 
-func NewClientResponseDto(ctx context.Context, w http.ResponseWriter, statusCode int, message string, payload interface{}) {
+func NewSuccessClientResponseDto(ctx context.Context, w http.ResponseWriter, payload any) {
 	response := ClientResponseDto{
-		Status:  statusCode,
-		Message: message,
+		Status:  http.StatusOK,
+		Message: "success",
 		Payload: payload,
 	}
-	sendData(ctx, w, response, statusCode, message)
-}
-
-func NewSuccessClientResponseDto(ctx context.Context, w http.ResponseWriter, payload interface{}) {
-	NewClientResponseDto(ctx, w, 200, "success", payload)
+	sendData(ctx, w, response, http.StatusOK, "success")
 }
 
 func NewErrorClientResponseDto(ctx context.Context, w http.ResponseWriter, statusCode int, message string) {
-	NewClientResponseDto(ctx, w, statusCode, message, "")
+	response := ClientResponseDto{
+		Status:  statusCode,
+		Message: message,
+		Payload: "",
+	}
+	sendData(ctx, w, response, statusCode, message)
 }
 
 func sendData(ctx context.Context, w http.ResponseWriter, response ClientResponseDto, statusCode int, message string) {

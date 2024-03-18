@@ -1,10 +1,10 @@
 create table users
 (
-    id            SERIAL PRIMARY KEY,
-    name          TEXT                                     NOT NULL,
-    mail          TEXT UNIQUE,
-    password_hash TEXT,
-    salt          TEXT,
+    id            serial primary key,
+    name          text                                     not null,
+    mail          text unique,
+    password_hash text,
+    salt          text,
     role          smallint check (role >= 0 and role <= 1) not null default 0,
     created_at    timestamptz                                       default timezone('europe/moscow'::text, now()),
     updated_at    timestamptz                                       default timezone('europe/moscow'::text, now())

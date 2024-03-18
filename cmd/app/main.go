@@ -67,6 +67,7 @@ func run() error {
 	}
 
 	<-stopped
+	logger.Info("Bye! Good day :)")
 
 	return nil
 }

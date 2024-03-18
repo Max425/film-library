@@ -68,7 +68,7 @@ func (h *FilmHandler) CreateFilm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dto.NewSuccessClientResponseDto(r.Context(), w, createdFilm)
+	dto.NewSuccessClientResponseDto(r.Context(), w, dto.FilmDomainToDto(createdFilm))
 }
 
 // UpdateFilm updates an existing film.
@@ -110,7 +110,7 @@ func (h *FilmHandler) UpdateFilm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dto.NewSuccessClientResponseDto(r.Context(), w, updatedFilm)
+	dto.NewSuccessClientResponseDto(r.Context(), w, dto.FilmDomainToDto(updatedFilm))
 }
 
 // DeleteFilm deletes an existing film.
@@ -165,6 +165,10 @@ func (h *FilmHandler) GetAllFilms(w http.ResponseWriter, r *http.Request) {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, common.ErrInternal.String())
 		return
 	}
+	data := make([]*dto.Film, len(films))
+	for i, film := range films {
+		data[i] = dto.FilmDomainToDto(film)
+	}
 
-	dto.NewSuccessClientResponseDto(r.Context(), w, films)
+	dto.NewSuccessClientResponseDto(r.Context(), w, data)
 }
