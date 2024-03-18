@@ -31,7 +31,7 @@ func (r *FilmRepository) CreateFilm(ctx context.Context, film *domain.Film) (*do
 		r.logger.Error("Failed to create film", zap.Error(err))
 		return nil, err
 	}
-	return film, nil
+	return store.FilmStoreToDomain(storeFilm)
 }
 
 func (r *FilmRepository) FindFilmByID(ctx context.Context, id int) (*domain.Film, error) {

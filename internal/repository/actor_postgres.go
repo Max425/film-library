@@ -31,7 +31,7 @@ func (r *ActorRepository) CreateActor(ctx context.Context, actor *domain.Actor) 
 		r.logger.Error("Failed to create actor", zap.Error(err))
 		return nil, err
 	}
-	return actor, nil
+	return store.ActorStoreToDomain(storeActor)
 }
 
 func (r *ActorRepository) FindActorByID(ctx context.Context, id int) (*domain.Actor, error) {

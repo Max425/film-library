@@ -302,11 +302,6 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: Actor ID
-        in: path
-        name: id
-        required: true
-        type: integer
       - description: Actor object to be updated
         in: body
         name: input
@@ -336,11 +331,6 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: Film ID
-        in: path
-        name: id
-        required: true
-        type: integer
       - description: Film object to be updated
         in: body
         name: input

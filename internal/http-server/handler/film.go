@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"errors"
 	"github.com/Max425/film-library.git/internal/common"
 	"github.com/Max425/film-library.git/internal/domain"
 	"github.com/Max425/film-library.git/internal/http-server/handler/dto"
@@ -76,7 +77,6 @@ func (h *FilmHandler) CreateFilm(w http.ResponseWriter, r *http.Request) {
 // @Tags films
 // @Accept json
 // @Produce json
-// @Param id path int true "Film ID"
 // @Param input body dto.Film true "Film object to be updated"
 // @Success 200 {object} dto.Film "Film updated successfully"
 // @Failure 400 {string} string "Bad request"
@@ -106,6 +106,10 @@ func (h *FilmHandler) UpdateFilm(w http.ResponseWriter, r *http.Request) {
 	updatedFilm, err := h.filmService.UpdateFilm(r.Context(), domainFilm)
 	if err != nil {
 		h.log.Error("Failed to update film", zap.Error(err))
+		if errors.Is(err, domain.ErrNotFound) {
+			dto.NewErrorClientResponseDto(r.Context(), w, http.StatusNotFound, common.ErrNotFound.String())
+			return
+		}
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, common.ErrInternal.String())
 		return
 	}
@@ -129,7 +133,8 @@ func (h *FilmHandler) DeleteFilm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	idStr := r.URL.Path[len("/api/films/"):]
+	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid film ID")
 		return
@@ -138,6 +143,10 @@ func (h *FilmHandler) DeleteFilm(w http.ResponseWriter, r *http.Request) {
 	err = h.filmService.DeleteFilm(r.Context(), id)
 	if err != nil {
 		h.log.Error("Failed to delete film", zap.Error(err))
+		if errors.Is(err, domain.ErrNotFound) {
+			dto.NewErrorClientResponseDto(r.Context(), w, http.StatusNotFound, common.ErrNotFound.String())
+			return
+		}
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, common.ErrInternal.String())
 		return
 	}

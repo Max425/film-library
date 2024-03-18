@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"errors"
 	"github.com/Max425/film-library.git/internal/common"
 	"github.com/Max425/film-library.git/internal/domain"
 	"github.com/Max425/film-library.git/internal/http-server/handler/dto"
@@ -76,7 +77,6 @@ func (h *ActorHandler) CreateActor(w http.ResponseWriter, r *http.Request) {
 // @Tags actors
 // @Accept json
 // @Produce json
-// @Param id path int true "Actor ID"
 // @Param input body dto.Actor true "Actor object to be updated"
 // @Success 200 {object} dto.Actor "Actor updated successfully"
 // @Failure 400 {string} string "Bad request"
@@ -105,6 +105,10 @@ func (h *ActorHandler) UpdateActor(w http.ResponseWriter, r *http.Request) {
 	actorUpdated, err := h.actorService.UpdateActor(r.Context(), domainActor)
 	if err != nil {
 		h.log.Error("Failed to update actor", zap.Error(err))
+		if errors.Is(err, domain.ErrNotFound) {
+			dto.NewErrorClientResponseDto(r.Context(), w, http.StatusNotFound, common.ErrNotFound.String())
+			return
+		}
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, common.ErrInternal.String())
 		return
 	}
@@ -128,7 +132,8 @@ func (h *ActorHandler) DeleteActor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	actorID, err := strconv.Atoi(r.URL.Query().Get("id"))
+	idStr := r.URL.Path[len("/api/actors/"):]
+	actorID, err := strconv.Atoi(idStr)
 	if err != nil {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid actor ID")
 		return
@@ -136,6 +141,10 @@ func (h *ActorHandler) DeleteActor(w http.ResponseWriter, r *http.Request) {
 
 	if err = h.actorService.DeleteActor(r.Context(), actorID); err != nil {
 		h.log.Error("Failed to delete actor", zap.Error(err))
+		if errors.Is(err, domain.ErrNotFound) {
+			dto.NewErrorClientResponseDto(r.Context(), w, http.StatusNotFound, common.ErrNotFound.String())
+			return
+		}
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
 		return
 	}

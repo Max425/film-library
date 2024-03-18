@@ -403,13 +403,6 @@ const docTemplate = `{
                 "summary": "Update an existing actor",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "Actor ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
                         "description": "Actor object to be updated",
                         "name": "input",
                         "in": "body",
@@ -454,13 +447,6 @@ const docTemplate = `{
                 ],
                 "summary": "Update an existing film",
                 "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Film ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
                     {
                         "description": "Film object to be updated",
                         "name": "input",

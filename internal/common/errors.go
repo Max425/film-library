@@ -14,3 +14,7 @@ var (
 func (er *ErrorType) String() string {
 	return er.t
 }
+
+func (er *ErrorType) Error() string {
+	return er.t
+}
