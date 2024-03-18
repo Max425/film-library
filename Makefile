@@ -20,13 +20,16 @@ mod:
 
 tests:
 	go test -coverpkg=./... -coverprofile=cover.out.tmp ./...
-	cat cover.out.tmp | grep -v "mocks\|cmd\|configs\|docs\|constants\|utils" > cover.out
+	cat cover.out.tmp | grep -v "mocks\|cmd\|configs\|docs\|constants\|utils\|migrations\|common" > cover.out
 	go tool cover -func=cover.out
 
 mock:
-	echo 'Hello'
-#	mockgen -source=pkg/repository/repository.go -destination=pkg/repository/mocks/mock.go \
-#	&& mockgen -source=pkg/service/service.go -destination=pkg/service/mocks/mock.go
+	mockgen -source=internal/http-server/handler/actor.go -destination=mocks/service/mock_actor.go
+	mockgen -source=internal/http-server/handler/film.go -destination=mocks/service/mock_film.go
+	mockgen -source=internal/http-server/handler/auth.go -destination=mocks/service/mock_auth.go
+	mockgen -source=internal/service/actor.go -destination=mocks/db/mock_actor.go
+	mockgen -source=internal/service/film.go -destination=mocks/db/mock_film.go
+	mockgen -source=internal/service/auth.go -destination=mocks/db/mock_auth.go
 
 swag:
 	swag init -g cmd/app/main.go
