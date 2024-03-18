@@ -23,6 +23,7 @@
 
 ## Диаграмма сущностей
 
+![image](https://github.com/Max425/film-library/assets/57855981/3e6b13ed-9cf2-455a-8695-0a24e1ffd5a8)
 
 ## Аутентификация
 
