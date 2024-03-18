@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/Max425/film-library.git/internal/domain"
 	"github.com/Max425/film-library.git/internal/repository/store"
 	"github.com/jmoiron/sqlx"
@@ -88,15 +89,15 @@ func (r *FilmRepository) DeleteFilm(ctx context.Context, id int) error {
 	return nil
 }
 
-func (r *FilmRepository) GetAllFilms(ctx context.Context) ([]*domain.Film, error) {
-	query := `
-		SELECT f.id, f.title, f.description, f.release_date, f.rating,
-			   a.id AS actor_id, COALESCE(a.name, ''), COALESCE(a.gender, ''), COALESCE(a.birth_date, '0001-01-01')
-		FROM film AS f
-		LEFT JOIN film_actor AS fa ON f.id = fa.film_id
-		LEFT JOIN actor AS a ON fa.actor_id = a.id
-		ORDER BY f.rating DESC
-	`
+func (r *FilmRepository) GetAllFilms(ctx context.Context, sortBy, order string) ([]*domain.Film, error) {
+	query := fmt.Sprintf(`
+	SELECT f.id, f.title, f.description, f.release_date, f.rating,
+		   a.id AS actor_id, COALESCE(a.name, ''), COALESCE(a.gender, ''), COALESCE(a.birth_date, '0001-01-01')
+	FROM film AS f
+	LEFT JOIN film_actor AS fa ON f.id = fa.film_id
+	LEFT JOIN actor AS a ON fa.actor_id = a.id
+	ORDER BY %s %s
+`, sortBy, order)
 	rows, err := r.db.QueryContext(ctx, query)
 	if err != nil {
 		r.logger.Error("Failed to get all films with actors", zap.Error(err))
@@ -115,7 +116,7 @@ func (r *FilmRepository) GetAllFilms(ctx context.Context) ([]*domain.Film, error
 		var actorName, actorGender sql.NullString
 		var actorBirthDate time.Time
 
-		if err := rows.Scan(&filmID, &filmTitle, &filmDescription, &filmReleaseDate, &filmRating, &actorID, &actorName, &actorGender, &actorBirthDate); err != nil {
+		if err = rows.Scan(&filmID, &filmTitle, &filmDescription, &filmReleaseDate, &filmRating, &actorID, &actorName, &actorGender, &actorBirthDate); err != nil {
 			r.logger.Error("Failed to scan row", zap.Error(err))
 			continue
 		}
@@ -130,7 +131,7 @@ func (r *FilmRepository) GetAllFilms(ctx context.Context) ([]*domain.Film, error
 			currentFilm.AddActor(actor)
 		}
 	}
-	if err := rows.Err(); err != nil {
+	if err = rows.Err(); err != nil {
 		r.logger.Error("Error while iterating rows", zap.Error(err))
 		return nil, err
 	}
@@ -161,7 +162,7 @@ func (r *FilmRepository) SearchFilms(ctx context.Context, fragment string) ([]*d
 		var filmReleaseDate time.Time
 		var filmRating float64
 
-		if err := rows.Scan(&filmID, &filmTitle, &filmDescription, &filmReleaseDate, &filmRating); err != nil {
+		if err = rows.Scan(&filmID, &filmTitle, &filmDescription, &filmReleaseDate, &filmRating); err != nil {
 			r.logger.Error("Failed to scan row", zap.Error(err))
 			continue
 		}
@@ -169,7 +170,7 @@ func (r *FilmRepository) SearchFilms(ctx context.Context, fragment string) ([]*d
 		film, _ := domain.NewFilm(filmID, filmTitle, filmDescription, filmReleaseDate, filmRating, nil)
 		films = append(films, film)
 	}
-	if err := rows.Err(); err != nil {
+	if err = rows.Err(); err != nil {
 		r.logger.Error("Error while iterating rows", zap.Error(err))
 		return nil, err
 	}

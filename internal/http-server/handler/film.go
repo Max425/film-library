@@ -20,7 +20,7 @@ type FilmService interface {
 	UpdateFilmActors(ctx context.Context, id int, actorsId []int) (*domain.Film, error)
 	DeleteFilm(ctx context.Context, id int) error
 	SearchFilms(ctx context.Context, fragment string) ([]*domain.Film, error)
-	GetAllFilms(ctx context.Context) ([]*domain.Film, error)
+	GetAllFilms(ctx context.Context, sortBy, order string) ([]*domain.Film, error)
 }
 
 type FilmHandler struct {
@@ -232,12 +232,16 @@ func (h *FilmHandler) SearchFilms(w http.ResponseWriter, r *http.Request) {
 	dto.NewSuccessClientResponseDto(r.Context(), w, data)
 }
 
-// GetAllFilms retrieves all films.
+// GetAllFilms retrieves all films with optional sorting by title, rating, or release date.
+// By default, films are sorted by rating in descending order.
 // @Summary Retrieve all films
 // @Tags films
 // @Accept json
 // @Produce json
+// @Param sort_by query string false "Sort by: title, rating, release_date"
+// @Param order query string false "Sort order: asc, desc"
 // @Success 200 {array} []dto.Film "List of films"
+// @Failure 400 {string} string "Bad request"
 // @Failure 500 {string} string "Internal server error"
 // @Router /api/films [get]
 func (h *FilmHandler) GetAllFilms(w http.ResponseWriter, r *http.Request) {
@@ -246,12 +250,42 @@ func (h *FilmHandler) GetAllFilms(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	films, err := h.filmService.GetAllFilms(r.Context())
+	// Parse query parameters for sorting
+	sortBy := r.URL.Query().Get("sort_by")
+	order := r.URL.Query().Get("order")
+
+	// Default sorting by rating in descending order
+	if sortBy == "" {
+		sortBy = "rating"
+	}
+	if order == "" {
+		order = "desc"
+	}
+
+	// Validate order parameter
+	if order != "asc" && order != "desc" {
+		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "Invalid sort order")
+		return
+	}
+	validSortFields := map[string]bool{
+		"title":        true,
+		"rating":       true,
+		"release_date": true,
+	}
+	if !validSortFields[sortBy] {
+		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "Invalid sort by field")
+		return
+	}
+
+	// Get films with optional sorting
+	films, err := h.filmService.GetAllFilms(r.Context(), sortBy, order)
 	if err != nil {
 		h.log.Error("Failed to get all films", zap.Error(err))
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, common.ErrInternal.String())
 		return
 	}
+
+	// Convert domain films to DTOs
 	data := make([]*dto.Film, len(films))
 	for i, film := range films {
 		data[i] = dto.FilmDomainToDto(film)

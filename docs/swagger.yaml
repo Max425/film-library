@@ -251,6 +251,15 @@ paths:
     get:
       consumes:
       - application/json
+      parameters:
+      - description: 'Sort by: title, rating, release_date'
+        in: query
+        name: sort_by
+        type: string
+      - description: 'Sort order: asc, desc'
+        in: query
+        name: order
+        type: string
       produces:
       - application/json
       responses:
@@ -262,6 +271,10 @@ paths:
                 $ref: '#/definitions/dto.Film'
               type: array
             type: array
+        "400":
+          description: Bad request
+          schema:
+            type: string
         "500":
           description: Internal server error
           schema:

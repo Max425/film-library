@@ -324,6 +324,20 @@ const docTemplate = `{
                     "films"
                 ],
                 "summary": "Retrieve all films",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Sort by: title, rating, release_date",
+                        "name": "sort_by",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort order: asc, desc",
+                        "name": "order",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "List of films",
@@ -335,6 +349,12 @@ const docTemplate = `{
                                     "$ref": "#/definitions/dto.Film"
                                 }
                             }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
                         }
                     },
                     "500": {
